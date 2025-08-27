@@ -1,2 +1,2 @@
-# Halie Pearson
-
+# 340-Semi-Project
+Group Project
