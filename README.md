@@ -1,3 +1,2 @@
-# 340-Semi-Project
-Halie Pearson
+# Halie Pearson
 
