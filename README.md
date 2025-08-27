@@ -1,2 +1,3 @@
 # 340-Semi-Project
-Group Project
+Halie Pearson
+
