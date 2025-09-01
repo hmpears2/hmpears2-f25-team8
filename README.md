@@ -1,33 +1,28 @@
 # f25-team8
-Semester Long CSC340 Project
-# Name
-Halie Pearson
+>Semester Long CSC340 Project
 
+## Title
+> HealthCheck Pro
 
+## Team Members
+> **Halie Pearson**
+  , **Braulio Esquina**
 
-    ## Title
-    > HealthCheck Pro
+## Description
 
-    ## Team Members
-    > Halie Pearson
+> HealthCheck Pro is a comprehensive symptom checker web application designed to provide preliminary health assessments to users experiencing medical concerns. The platform enables individuals to create detailed health profiles, complete pre-screening questionnaires about their medical history, and input current symptoms to receive potential diagnosis suggestions and recommended next steps.
 
-    > Braulio Esquina
+>Motivation: Many people experience uncertainty when symptoms arise and need guidance on whether to seek immediate medical attention, schedule a routine appointment, or try self-care measures. This app bridges the gap between initial symptom onset and professional medical consultation.
 
-    ## Description
- 
-    > HealthCheck Pro is a comprehensive symptom checker web application designed to provide preliminary health assessments to users experiencing medical concerns. The platform enables individuals to create detailed health profiles, complete pre-screening questionnaires about their medical history, and input current symptoms to receive potential diagnosis suggestions and recommended next steps.
+>Goals:
+    - Provides accessible, preliminary health assessments 24/7
+    - Helps users make informed decisions about seeking medical care
+    - Reduces unnecessary emergency room visits for non-urgent conditions
+    - Creates a comprehensive health history database for users to share with healthcare providers
 
-    > Motivation: Many people experience uncertainty when symptoms arise and need guidance on whether to seek immediate medical attention, schedule a routine appointment, or try self-care measures. This app bridges the gap between initial symptom onset and professional medical consultation.
+>Problem Solved: The app addresses the common dilemma of symptom uncertainty by offering evidence-based guidance, helping users understand when symptoms require urgent care versus routine medical attention, and providing a structured way to document health concerns over time.
 
-    >Goals:
-        - Provides accessible, preliminary health assessments 24/7
-        - Helps users make informed decisions about seeking medical care
-        - Reduces unnecessary emergency room visits for non-urgent conditions
-        - Creates a comprehensive health history database for users to share with healthcare providers
-
-    >Problem Solved: The app addresses the common dilemma of symptom uncertainty by offering evidence-based guidance, helping users understand when symptoms require urgent care versus routine medical attention, and providing a structured way to document health concerns over time.
-
-    >App Functions
+>App Functions
 1. Patient (Primary User Role):
 
 (1.) Create/modify patient profile - Users register with basic authentication, input essential demographic information (age, gender) and key medical history through simple forms that integrate easily with third-party medical APIs.
