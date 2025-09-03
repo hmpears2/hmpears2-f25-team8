@@ -42,10 +42,3 @@ verified reviews, and easy booking capabilities.
      2. Create services - Providers can list multiple service offerings with detailed descriptions, pricing models (hourly/flat rate/estimate-based), required materials, typical project duration, and skill level requirements. Each service can include photo galleries and FAQ sections. 
      3. View customer statistics - The provider dashboard displays analytics including booking frequency, revenue tracking, customer demographics, peak service times, and performance metrics compared to platform averages. Reports are available for different time periods with export capabilities. 
      4. Reply to reviews - Providers can respond to customer reviews through a built-in messaging system, address concerns professionally, thank customers for positive feedback, and demonstrate their commitment to customer service. All responses are public and time-stamped. 
-
-3. SysAdmin (the user with the admin role): 
-
-     1. Manage user access - Administrators can approve/suspend/ban user accounts, verify provider credentials, manage account permissions, and handle dispute resolution. The system includes automated fraud detection and manual review capabilities for suspicious activities. 
-     2. Moderate services - Admins review and approve new service listings, ensure compliance with platform guidelines, verify pricing reasonableness, and remove inappropriate content. They maintain quality standards through regular audits and provider performance monitoring. 
-     3. Moderate reviews - The system flags potentially fraudulent or inappropriate reviews for admin review, allows removal of policy-violating content, and ensures review authenticity through verification processes. Admins can also facilitate dispute resolution between customers and providers. 
-     4. View usage statistics - Comprehensive analytics dashboard showing platform wide metrics including user growth, booking volume, revenue trends, geographic usage patterns, popular services, customer satisfaction scores, and provider performance statistics with customizable reporting periods and data export options. 
