@@ -6,7 +6,7 @@
 
 ## Team Members
 > **Halie Pearson**
-  , **Braulio Esquina**
+  , **Braulio Pantoja Esquina**
 
 ## Description
 
@@ -36,7 +36,10 @@
 
 2. Provider (the user with the provider role): 
 
-     1. Create/modify/remove provider profile - Service providers complete a comprehensive registration including business license verification, insurance documentation, certifications, and portfolio uploads. They can update availability calendars, service areas, pricing structures, and business information through a provider dashboard. 
-     2. Create services - Providers can list multiple service offerings with detailed descriptions, pricing models (hourly/flat rate/estimate-based), required materials, typical project duration, and skill level requirements. Each service can include photo galleries and FAQ sections. 
-     3. View customer statistics - The provider dashboard displays analytics including booking frequency, revenue tracking, customer demographics, peak service times, and performance metrics compared to platform averages. Reports are available for different time periods with export capabilities. 
-     4. Reply to reviews - Providers can respond to customer reviews through a built-in messaging system, address concerns professionally, thank customers for positive feedback, and demonstrate their commitment to customer service. All responses are public and time-stamped. 
+     1. Create/modify/remove provider profile - Service providers complete a comprehensive registration including business license verification, insurance documentation, certifications, and portfolio uploads. They can update availability calendars, service areas, pricing structures, and business information through a provider dashboard. These all get reviewed by real people that have admin access.
+
+     2. Create services - Providers can list multiple service offerings with detailed descriptions, pricing models (hourly/flat rate/estimate-based), required materials, typical project duration, and skill level requirements. Each service can include photo galleries and FAQ sections. These services are limited to blue collar type jobs which is what the app is meant for.
+
+     3. View customer statistics - The provider dashboard displays analytics including booking frequency, revenue tracking, customer demographics, peak service times, and performance metrics compared to platform averages. Reports are available for different time periods with export capabilities. It also alerts to when a potential customer has viewed their page. 
+
+     4. Reply to reviews - Providers can respond to customer reviews through a built-in messaging system, address concerns professionally, thank customers for positive feedback, and demonstrate their commitment to customer service. All responses are public and time-stamped. Reviews are also limited to finished jobs only.
