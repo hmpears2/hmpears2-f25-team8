@@ -44,83 +44,87 @@ Table of Contents
 ## 1. Introduction
 
 ### 1.1 Document Purpose
-Describe the purpose of the SRS and its intended audience.
+Defines the functional requirements of HomeConnectPro. This file is a detailed guide for the programming team and anyone else that is allowed access to this program and how to use it/set it up
 
 ### 1.2 Product Scope
-Identify the product whose software requirements are specified in this document, including the revision or release number. Explain what the product that is covered by this SRS will do, particularly if this SRS describes only part of the system or a single subsystem. 
-Provide a short description of the software being specified and its purpose, including relevant benefits, objectives, and goals. Relate the software to corporate goals or business strategies. If a separate vision and scope document is available, refer to it rather than duplicating its contents here.
+Home Connect Pro is a site that allows homeowners to find and hire contractors for services such as roofing, painting, plumbing and other home repairs. The platform allows homeowners to post job requests and receive estimates from contractors, allow contractors to create profiles and showcase their work, provide a secure payment system for transactions, and include a review system for homeowners to rate contractors and for contractors to rate customers.
 
-### 1.3 Definitions, Acronyms and Abbreviations                                                                                                                                                                          |
+### 1.3 Definitions, Acronyms and Abbreviations                                                                 
+SRS: Software Requirements Specification.
+HomeConnectPro: The software platform being developed.
+Contractor: A professional offering home repair or improvement services.
+Homeowner: A user seeking contractors for home services.                                                                                                         |
 
 ### 1.4 References
-List any other documents or Web addresses to which this SRS refers. These may include user interface style guides, contracts, standards, system requirements specifications, use case documents, or a vision and scope document. Provide enough information so that the reader could access a copy of each reference, including title, author, version number, date, and source or location.
+None as of right now
 
 ### 1.5 Document Overview
-Describe what the rest of the document contains and how it is organized.
+Section 1: Introduction to the document and its purpose.
+Section 2: Overview of the product, including its functions, constraints, and user characteristics.
+Section 3: Detailed functional and non-functional requirements.
 
 ## 2. Product Overview
 This section should describe the general factors that affect the product and its requirements. This section does not state specific requirements. Instead, it provides a background for those requirements, which are defined in detail in Section 3, and makes them easier to understand.
 
 ### 2.1 Product Functions
-Summarize the major functions the product must perform or must let the user perform. Details will be provided in Section 3, so only a high level summary (such as a bullet list) is needed here. Organize the functions to make them understandable to any reader of the SRS. A picture of the major groups of related requirements and how they relate, such as a top level data flow diagram or object class diagram, is often effective.
+Job Posting: Homeowners can post job requests with details such as location, budget, and timeline.
+Contractor Bidding: Contractors can bid on job requests.
+User Profiles: Both homeowners and contractors can create and manage profiles.
+Payment System: Secure payment processing for completed jobs.
+Review System: Homeowners can rate and review contractors and vice versa.
 
 ### 2.2 Product Constraints
-This subsection should provide a general description of any other items that will limit the developer’s options. These may include:  
+The platform must support desktop.
+Payment processing must comply with PCI DSS standards.
 
-* Interfaces to users, other applications or hardware.  
-* Quality of service constraints.  
-* Standards compliance.  
-* Constraints around design or implementation.
-  
 ### 2.3 User Characteristics
-Identify the various user classes that you anticipate will use this product. User classes may be differentiated based on frequency of use, subset of product functions used, technical expertise, security or privilege levels, educational level, or experience. Describe the pertinent characteristics of each user class. Certain requirements may pertain only to certain user classes. Distinguish the most important user classes for this product from those who are less important to satisfy.
+Homeowners: Typically non-technical users who need an intuitive interface to post jobs and hire contractors.
+Contractors: Professionals with varying levels of technical expertise who need tools to bid on jobs and manage their profiles.
 
 ### 2.4 Assumptions and Dependencies
-List any assumed factors (as opposed to known facts) that could affect the requirements stated in the SRS. These could include third-party or commercial components that you plan to use, issues around the development or operating environment, or constraints. The project could be affected if these assumptions are incorrect, are not shared, or change. Also identify any dependencies the project has on external factors, such as software components that you intend to reuse from another project, unless they are already documented elsewhere (for example, in the vision and scope document or the project plan).
+The platform assumes users have internet access.
+The system depends on third-party payment gateways for transactions.
+The platform relies on external APIs for location-based services.
 
 ## 3. Requirements
 
 ### 3.1 Functional Requirements 
-This section specifies the software product's requirements. Specify all of the software requirements to a level of detail sufficient to enable designers to design a software system to satisfy those requirements, and to enable testers to test that the software system satisfies those requirements.
+Homeowner Dashboard: To post jobs, view bids, and manage payments.
+Contractor Dashboard: To view job postings, submit bids, and manage profiles.
+Admin Panel: For managing users, jobs, and disputes.
 
-The specific requirements should:
-* Be uniquely identifiable.
-* State the subject of the requirement (e.g., system, software, etc.) and what shall be done.
-* Optionally state the conditions and constraints, if any.
-* Describe every input (stimulus) into the software system, every output (response) from the software system, and all functions performed by the software system in response to an input or in support of an output.
-* Be verifiable (e.g., the requirement realization can be proven to the customer's satisfaction)
-* Conform to agreed upon syntax, keywords, and terms.
 
 #### 3.1.1 User interfaces
-Define the software components for which a user interface is needed. Describe the logical characteristics of each interface between the software product and the users. This may include sample screen images, any GUI standards or product family style guides that are to be followed, screen layout constraints, standard buttons and functions (e.g., help) that will appear on every screen, keyboard shortcuts, error message display standards, and so on. Details of the user interface design should be documented in a separate user interface specification.
-
-Could be further divided into Usability and Convenience requirements.
+The interface will include standard navigation, search functionality, and responsive design.
 
 #### 3.1.2 Hardware interfaces
-Describe the logical and physical characteristics of each interface between the software product and the hardware components of the system. This may include the supported device types, the nature of the data and control interactions between the software and the hardware, and communication protocols to be used.
+The platform will interact with user devices such as desktops, laptops.
+The system will support standard input devices (keyboard and mouse).
 
 #### 3.1.3 Software interfaces
-Describe the connections between this product and other specific software components (name and version), including databases, operating systems, tools, libraries, and integrated commercial components. Identify the data items or messages coming into the system and going out and describe the purpose of each. Describe the services needed and the nature of communications. Refer to documents that describe detailed application programming interface protocols. Identify data that will be shared across software components. If the data sharing mechanism must be implemented in a specific way (for example, use of a global data area in a multitasking operating system), specify this as an implementation constraint.
+Integration with third-party payment gateways (e.g., Stripe, PayPal).
+Integration with Google Maps API for location-based services.
+Use of a relational database (e.g., MySQL) for storing user and job data.
 
 ### 3.2 Non Functional Requirements 
 
 #### 3.2.1 Performance
-If there are performance requirements for the product under various circumstances, state them here and explain their rationale, to help the developers understand the intent and make suitable design choices. Specify the timing relationships for real time systems. Make such requirements as specific as possible. You may need to state performance requirements for individual functional requirements or features.
+The system must handle up to 10,000 concurrent users with a response time of less than 2 seconds for 95% of requests.
 
 #### 3.2.2 Security
-Specify any requirements regarding security or privacy issues surrounding use of the product or protection of the data used or created by the product. Define any user identity authentication requirements. Refer to any external policies or regulations containing security issues that affect the product. Define any security or privacy certifications that must be satisfied.
+All user data must be encrypted in transit (TLS 1.2 or higher) and at rest.
 
 #### 3.2.3 Reliability
-Specify the factors required to establish the required reliability of the software system at time of delivery.
+The system must have 99.9% uptime, with automated failover mechanisms in case of server failure.
 
 #### 3.2.4 Availability
-Specify the factors required to guarantee a defined availability level for the entire system such as checkpoint, recovery, and restart.
+The platform must be available 24/7, with scheduled maintenance windows communicated to users in advance.
 
 #### 3.2.5 Compliance
-Specify the requirements derived from existing standards or regulations
+The platform must comply with GDPR for data privacy and PCI DSS for payment security.
 
 #### 3.2.6 Cost
-Specify monetary cost of the software product.
+None so far.
 
 #### 3.2.7 Deadline
-Specify schedule for delivery of the software product.
+The end of the semester of Fall 2025
