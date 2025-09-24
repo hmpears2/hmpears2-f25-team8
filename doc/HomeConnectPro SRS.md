@@ -1,10 +1,10 @@
 # Software Requirements Specification
-## For <project name>
+## For <HomeConnect Pro>
 
 Version 0.1  
-Prepared by <author>  
-<organization>  
-<date created> 
+Prepared by <Braulio Pantoja Esquina, Halie Pearson>  
+<CSC-340>  
+<September 18th, 2025> 
 
 Table of Contents
 =================
@@ -37,9 +37,9 @@ Table of Contents
 ## Revision History
 | Name | Date    | Reason For Changes  | Version   |
 | ---- | ------- | ------------------- | --------- |
-|      |         |                     |           |
-|      |         |                     |           |
-|      |         |                     |           |
+|Halie |09/18/25 |Created introduction, created homeowner user characteristics, non-functional requirements|    0.1    |
+|Braulio|09/18/25|Created product overview, created provider user characterists, functional requirements|    0.1    |
+|Halie |09/23/25 |Refined product scope, updated title & prepared by section|   0.2   |
 
 ## 1. Introduction
 
@@ -47,7 +47,7 @@ Table of Contents
 Defines the functional requirements of HomeConnectPro. This file is a detailed guide for the programming team and anyone else that is allowed access to this program and how to use it/set it up
 
 ### 1.2 Product Scope
-Home Connect Pro is a site that allows homeowners to find and hire contractors for services such as roofing, painting, plumbing and other home repairs. The platform allows homeowners to post job requests and receive estimates from contractors, allow contractors to create profiles and showcase their work, provide a secure payment system for transactions, and include a review system for homeowners to rate contractors and for contractors to rate customers.
+Home Connect Pro is a site that allows homeowners to find and hire contractors for help with desired/frequent home services such as roofing, painting, plumbing and other home repairs. The platform allows homeowners to post job requests and receive estimates from contractors, allow contractors to create profiles and showcase their work, provide a secure payment system for transactions, and include a review system for homeowners to rate contractors and for contractors to rate customers.
 
 ### 1.3 Definitions, Acronyms and Abbreviations                                                                 
 SRS: Software Requirements Specification.
