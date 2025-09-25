@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomeConnect Pro - Customer Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary" href="#">
+                <i class="bi bi-house-fill me-2"></i>HOMECONNECT PRO
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active bg-primary text-white rounded px-3" href="#dashboard">DASHBOARD</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="#services">VIEW SERVICES</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="#subscriptions">MY SUBSCRIPTIONS</a>
+                    </li>
+                </ul>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle fs-5 me-2"></i>John Smith
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#profile"><i class="bi bi-gear me-2"></i>Modify Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="index.html"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard Content -->
+    <div class="container-fluid py-4" id="dashboard">
+        <!-- Welcome Section -->
+        <div class="alert alert-primary bg-gradient border-0 mb-4">
+            <h1 class="alert-heading h2 mb-2">Welcome back, John!</h1>
+            <p class="mb-0">Manage your profile, view services, and write reviews</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mb-5">
+            <h2 class="mb-3 text-dark">Quick Actions</h2>
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card text-decoration-none h-100 border-primary bg-white shadow-sm" onclick="showServices()">
+                        <div class="card-body text-center">
+                            <i class="bi bi-search fs-1 text-primary mb-3"></i>
+                            <h5 class="card-title text-dark">View Available Services</h5>
+                            <p class="card-text text-muted small">Browse and subscribe to services</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card text-decoration-none h-100 border-success bg-white shadow-sm" onclick="showSubscriptions()">
+                        <div class="card-body text-center">
+                            <i class="bi bi-bookmark-check fs-1 text-success mb-3"></i>
+                            <h5 class="card-title text-dark">My Subscriptions</h5>
+                            <p class="card-text text-muted small">Manage subscribed services</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card text-decoration-none h-100 border-warning bg-white shadow-sm" onclick="showProfile()">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-gear fs-1 text-warning mb-3"></i>
+                            <h5 class="card-title text-dark">Modify Profile</h5>
+                            <p class="card-text text-muted small">Update your customer profile</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card text-decoration-none h-100 border-info bg-white shadow-sm" onclick="showReviews()">
+                        <div class="card-body text-center">
+                            <i class="bi bi-star fs-1 text-info mb-3"></i>
+                            <h5 class="card-title text-dark">Write Reviews</h5>
+                            <p class="card-text text-muted small">Review subscribed services</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services Section -->
+    <div class="container-fluid py-4 d-none" id="services">
+        <h2 class="mb-4">Available Services</h2>
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Plumbing Services</h5>
+                        <p class="card-text">Professional plumbing repairs and installations</p>
+                        <p class="text-primary fw-bold">$50/hour</p>
+                        <button class="btn btn-primary" onclick="subscribeService('Plumbing Services')">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Electrical Services</h5>
+                        <p class="card-text">Licensed electrical work and troubleshooting</p>
+                        <p class="text-primary fw-bold">$75/hour</p>
+                        <button class="btn btn-primary" onclick="subscribeService('Electrical Services')">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Painting Services</h5>
+                        <p class="card-text">Interior and exterior painting solutions</p>
+                        <p class="text-primary fw-bold">$40/hour</p>
+                        <button class="btn btn-primary" onclick="subscribeService('Painting Services')">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscriptions Section -->
+    <div class="container-fluid py-4 d-none" id="subscriptions">
+        <h2 class="mb-4">My Subscriptions</h2>
+        <div id="subscribedServices">
+            <p class="text-muted">No subscriptions yet. <a href="#services" onclick="showServices()">Browse available services</a></p>
+        </div>
+    </div>
+
+    <!-- Profile Section -->
+    <div class="container-fluid py-4 d-none" id="profile">
+        <h2 class="mb-4">Customer Profile</h2>
+        <div class="card">
+            <div class="card-body">
+                <form id="profileForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" value="John" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" value="Smith" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" value="john.smith@email.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" value="(555) 123-4567" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <input type="text" class="form-control" value="123 Oak Street" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let subscriptions = [];
+
+        function showDashboard() {
+            hideAllSections();
+            document.getElementById('dashboard').classList.remove('d-none');
+            updateNavActive('dashboard');
+        }
+
+        function showServices() {
+            hideAllSections();
+            document.getElementById('services').classList.remove('d-none');
+            updateNavActive('services');
+        }
+
+        function showSubscriptions() {
+            hideAllSections();
+            document.getElementById('subscriptions').classList.remove('d-none');
+            updateNavActive('subscriptions');
+            displaySubscriptions();
+        }
+
+        function showProfile() {
+            hideAllSections();
+            document.getElementById('profile').classList.remove('d-none');
+            updateNavActive('profile');
+        }
+
+        function showReviews() {
+            if (subscriptions.length === 0) {
+                alert('You need to subscribe to services before writing reviews.');
+                return;
+            }
+            
+            let reviewService = prompt('Which service would you like to review?\n' + subscriptions.join('\n'));
+            if (reviewService && subscriptions.includes(reviewService)) {
+                let rating = prompt('Rate the service (1-5 stars):');
+                let comment = prompt('Write your review:');
+                if (rating && comment) {
+                    alert(`Review submitted for ${reviewService}!\nRating: ${rating} stars\nComment: ${comment}`);
+                }
+            }
+        }
+
+        function hideAllSections() {
+            document.getElementById('dashboard').classList.add('d-none');
+            document.getElementById('services').classList.add('d-none');
+            document.getElementById('subscriptions').classList.add('d-none');
+            document.getElementById('profile').classList.add('d-none');
+        }
+
+        function updateNavActive(section) {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active', 'bg-primary', 'text-white');
+                link.classList.add('text-dark');
+            });
+        }
+
+        function subscribeService(serviceName) {
+            if (!subscriptions.includes(serviceName)) {
+                subscriptions.push(serviceName);
+                alert(`Successfully subscribed to ${serviceName}!`);
+            } else {
+                alert(`You are already subscribed to ${serviceName}.`);
+            }
+        }
+
+        function displaySubscriptions() {
+            const container = document.getElementById('subscribedServices');
+            if (subscriptions.length === 0) {
+                container.innerHTML = '<p class="text-muted">No subscriptions yet. <a href="#" onclick="showServices()">Browse available services</a></p>';
+            } else {
+                let html = '<div class="row g-3">';
+                subscriptions.forEach(service => {
+                    html += `
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${service}</h5>
+                                    <p class="card-text">Subscribed service</p>
+                                    <button class="btn btn-success btn-sm" onclick="showReviews()">Write Review</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            }
+        }
+
+        // Profile form submission
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Profile updated successfully!');
+        });
+
+        // Navigation click handlers
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                if (href === '#dashboard') showDashboard();
+                else if (href === '#services') showServices();
+                else if (href === '#subscriptions') showSubscriptions();
+                else if (href === '#profile') showProfile();
+            });
+        });
+
+        // Initialize dashboard view
+        showDashboard();
+    </script>
+</body>
+</html>
