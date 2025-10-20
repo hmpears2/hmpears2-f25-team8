@@ -20,7 +20,7 @@ Table of Contents
 ## Revision History
 | Name | Date    | Reason For Changes  | Version   |
 | ---- | ------- | ------------------- | --------- |
-|Halie |10/16    | Initial Design      |    1      |
+|Halie |10/20    | Initial Design      |    1      |
 |      |         |                     |           |
 |      |         |                     |           |
 
@@ -77,6 +77,6 @@ Customers can view all their active service subscriptions on the subscriptions p
 A customer may write a review for any service they have subscribed to. The system first verifies the customer has active subscriptions. The review process prompts the customer to select which service to review, provide a rating from one to five stars, and write detailed feedback comments. A confirmation message acknowledges successful review submission.
 
 ## 3. UML Class Diagram
-![UML Class Diagram](https://github.com/csc340-uncg/f25-team0/blob/main/doc/Object-Oriented-Design/class-diagram.png)
+![UML Class Diagram]()
 ## 4. Database Schema
-![UML Class Diagram](https://github.com/csc340-uncg/f25-team0/blob/main/doc/Object-Oriented-Design/schema.png)
+![UML Class Diagram]()
