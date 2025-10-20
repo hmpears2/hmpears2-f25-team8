@@ -35,7 +35,7 @@ HomeConnect Pro streamlines the process of finding reliable home service profess
 
 ## 2. Use Cases
 ### 2.1 Use Case Model
-![Use Case Model](https://github.com/csc340-uncg/f25-team0/blob/main/doc/Object-Oriented-Design/use-case.png)
+![Use Case Model](./use-case.png)
 
 ### 2.2 Use Case Descriptions
 
@@ -45,7 +45,7 @@ HomeConnect Pro streamlines the process of finding reliable home service profess
 ##### 2.2.1.2 Log In
 
 ##### 2.2.1.3 Update Provider Profile
-\
+
 ##### 2.2.1.4 Create Services
 
 ##### 2.2.1.5 Edit Services
