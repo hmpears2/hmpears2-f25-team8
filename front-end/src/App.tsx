@@ -1,24 +1,22 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import ProviderDashboard from './pages/ProviderDashboard';
+import ProviderSignUp from './pages/ProviderSignup';
+import CustomerDashboard from './pages/CustomerDashboard';
+import CustomerSignUp from './pages/CustomerSignup';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="login-page">
-    <h1>Welcome to HealthCheck Pro!</h1>
-    <h2>Login Page</h2>
-    <div className="login-container">
-      <input type="text" placeholder="Username" className="login-input" />
-      <input type="password" placeholder="Password" className="login-input" />
-      <button className="login-button gmail">Sign in with Gmail</button>
-      <button className="login-button icloud">Sign in with iCloud</button>
-    </div>
-  </div>
-)
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/provider-dashboard" element={<ProviderDashboard />} />
+        <Route path="/provider-signup" element={<ProviderSignUp />} />
+        <Route path="/customer-dashboard" element={<CustomerDashboard />} />
+        <Route path="/customer-signup" element={<CustomerSignUp />} />
+      </Routes>
+    </Router>
+  );
 }
 
-
-
-export default App
+export default App;

@@ -18,11 +18,11 @@ Table of Contents
 * 4 [Database Schema](#4-database-schema)
 
 ## Revision History
-| Name | Date    | Reason For Changes  | Version   |
-| ---- | ------- | ------------------- | --------- |
-|Halie |10/20    | Initial Design      |    1      |
-|      |         |                     |           |
-|      |         |                     |           |
+| Name  | Date    | Reason For Changes  | Version   |
+| ----  | ------- | ------------------- | --------- |
+|Halie  |10/20    | Initial Design      |    1      |
+|Braulio|10/21    | Initial Design      |    1      |
+|       |         |                     |           |
 
 ## 1. Product Overview
 HomeConnect Pro is a comprehensive, user-friendly web application designed to connect customers with trusted home service providers. The platform serves as a centralized marketplace where service providers can showcase their expertise and manage their business, while customers can easily find, subscribe to, and review home services such as plumbing, electrical work, painting, and more.
@@ -41,24 +41,34 @@ HomeConnect Pro streamlines the process of finding reliable home service profess
 
 #### 2.2.1 Actor: Service Provider
 ##### 2.2.1.1 Sign Up
+A service provider can create an account by providing their first name, last name, email address, phone number, business name, primary service category, and password. They must agree to the Terms of Service and Privacy Policy. Email addresses must be unique in the system.
 
 ##### 2.2.1.2 Log In
+A service provider shall be able to sign in using their registered email, password, and selecting "Service Provider" as the user type. After successful authentication, the provider is directed to their dashboard displaying a welcome message and quick action cards.
 
 ##### 2.2.1.3 Update Provider Profile
+A service provider shall be able to modify their profile information by navigating to the profile page. They can update their first name, last name, email, phone number, business name, services, and password.
 
 ##### 2.2.1.4 Create Services
+A service provider can create new service offerings by providing a service name, description, pricing model (hourly or flat rate), and any additional details. These services will be displayed to customers browsing the platform.
 
 ##### 2.2.1.5 Edit Services
+A service provider can edit existing service offerings to update details such as the service name, description, pricing, availability, or services in general.
 
 ##### 2.2.1.6 Remove Services
+A service provider can remove services they no longer wish to offer.
 
 ##### 2.2.1.7 View Customer Statistics
+A service provider can view analytics related to their customers, such as the number of subscriptions, customer demographics, and revenue generated. This data helps providers understand their performance and customer base.
 
 ##### 2.2.1.8 View Reviews
+A service provider can view reviews left by customers for their services. Reviews include ratings and comments, providing valuable feedback to the provider.
 
 ##### 2.2.1.9 Reply to Reviews
+A service provider can reply to customer reviews to address concerns, thank customers for positive feedback, or provide clarifications. Replies are visible to all users.
 
 ##### 2.2.1.10 Remove Provider Profile
+A service provider can delete their account, which will remove their profile and all associated services from the platform. This action is irreversible.
 
 #### 2.2.2 Actor: Customer
 ##### 2.2.2.1 Sign Up
@@ -77,6 +87,6 @@ Customers can view all their active service subscriptions on the subscriptions p
 A customer may write a review for any service they have subscribed to. The system first verifies the customer has active subscriptions. The review process prompts the customer to select which service to review, provide a rating from one to five stars, and write detailed feedback comments. A confirmation message acknowledges successful review submission.
 
 ## 3. UML Class Diagram
-![UML Class Diagram]()
+![UML Class Diagram](./classdiagram.png)
 ## 4. Database Schema
-![UML Class Diagram]()
+![UML Class Diagram](./schema.png)
