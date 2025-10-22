@@ -29,9 +29,12 @@
 ## App Function
 1. Customer (the user with the customer role):
 
-     1. Create/modify customer profile - Customers register using email/phone verification and create profiles including home address, property type, preferred contact methods, and service history. Profile management includes photo upload, emergency contact information, and communication preferences accessible through a dedicated "My Profile" section. 
-     2. View available services - The app displays services through an intuitive category based interface (plumbing, electrical, carpentry, etc.) with search and filter functionality by location radius, availability, pricing, and ratings. Each service listing shows provider details, certifications, sample work photos, and customer reviews. 
-     3. Subscribe to available services - Customers can book services through an integrated scheduling system that shows real-time availability, allows them to select specific time slots, add project details/photos, and confirm appointments. The system sends automated confirmations and reminders to both parties. 
+     1. Create/modify customer profile - Customers register using email/phone verification and create profiles including home address, property type, preferred contact methods, and service history. Profile management includes photo upload, emergency contact information, and communication preferences accessible through a dedicated "My Profile" section.
+
+     2. View available services - The app displays services through an intuitive category based interface (plumbing, electrical, carpentry, etc.) with search and filter functionality by location radius, availability, pricing, and ratings. Each service listing shows provider details, certifications, sample work photos, and customer reviews.
+
+     3. Subscribe to available services - Customers can book services through an integrated scheduling system that shows real-time availability, allows them to select specific time slots, add project details/photos, and confirm appointments. The system sends automated confirmations and reminders to both parties.
+     
      4. Write reviews for subscribed services - After service completion, customers receive automated prompts to rate their experience using a 5-star system with written feedback options. Reviews include categories for punctuality, quality, communication, and value, with photo upload capabilities for before/after documentation. 
 
 2. Provider (the user with the provider role): 
