@@ -1,11 +1,11 @@
-package main.java.com.HomeConnectPro_hub.review;
+package com.HomeConnectPro_hub.review;
 
-import com.csc340.homeconnect_pro_hub.customer.Customer;
-import com.csc340.homeconnect_pro_hub.customer.CustomerService;
-import com.csc340.homeconnect_pro_hub.service.Service;
-import com.csc340.homeconnect_pro_hub.service.ServiceService;
-import com.csc340.homeconnect_pro_hub.serviceprovider.ServiceProvider;
-import com.csc340.homeconnect_pro_hub.subscription.SubscriptionService;
+import com.HomeConnectPro_hub.customer.Customer;
+import com.HomeConnectPro_hub.customer.CustomerService;
+import com.HomeConnectPro_hub.service.Service;
+import com.HomeConnectPro_hub.service.ServiceService;
+import com.HomeConnectPro_hub.provider.Provider;
+import com.HomeConnectPro_hub.subscription.SubscriptionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -128,7 +128,7 @@ public class ReviewService {
     /**
      * Get all reviews for a provider's services
      */
-    public List<Review> getReviewsByProvider(ServiceProvider provider) {
+    public List<Review> getReviewsByProvider(Provider provider) {
         return reviewRepository.findByServiceProvider(provider);
     }
     
@@ -150,7 +150,7 @@ public class ReviewService {
     /**
      * Get average rating for a provider (across all their services)
      */
-    public Double getAverageRatingByProvider(ServiceProvider provider) {
+    public Double getAverageRatingByProvider(Provider provider) {
         Double average = reviewRepository.findAverageRatingByProvider(provider);
         return average != null ? Math.round(average * 100.0) / 100.0 : 0.0;
     }
@@ -172,7 +172,7 @@ public class ReviewService {
     /**
      * Get review count for a provider
      */
-    public Long getReviewCountByProvider(ServiceProvider provider) {
+    public Long getReviewCountByProvider(Provider provider) {
         return reviewRepository.countByServiceProvider(provider);
     }
     
@@ -201,7 +201,7 @@ public class ReviewService {
     /**
      * Get rating distribution for a provider
      */
-    public Map<Integer, Long> getRatingDistributionByProvider(ServiceProvider provider) {
+    public Map<Integer, Long> getRatingDistributionByProvider(Provider provider) {
         List<Object[]> results = reviewRepository.findRatingDistributionByProvider(provider);
         Map<Integer, Long> distribution = new HashMap<>();
         
@@ -224,7 +224,7 @@ public class ReviewService {
      * Get comprehensive rating statistics for a provider (Use Case 2.2.1.7 - View Customer Statistics)
      */
     public Map<String, Object> getProviderRatingStatistics(Long providerId) {
-        ServiceProvider provider = new ServiceProvider();
+        Provider provider = new Provider();
         provider.setId(providerId);
         
         Map<String, Object> statistics = new HashMap<>();
@@ -237,7 +237,7 @@ public class ReviewService {
         List<Review> allReviews = getReviewsByProvider(provider);
         Map<String, Double> serviceRatings = allReviews.stream()
                 .collect(Collectors.groupingBy(
-                        review -> review.getService().getServiceName(),
+                        review -> review.getService().getName(),
                         Collectors.averagingDouble(Review::getRating)
                 ));
         
@@ -258,7 +258,7 @@ public class ReviewService {
     /**
      * Get recent reviews for a provider (top 10)
      */
-    public List<Review> getRecentReviewsByProvider(ServiceProvider provider) {
+    public List<Review> getRecentReviewsByProvider(Provider provider) {
         return reviewRepository.findTop10ByServiceProviderOrderByCreatedAtDesc(provider);
     }
     

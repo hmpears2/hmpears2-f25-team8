@@ -1,4 +1,4 @@
-package main.java.com.HomeConnectPro_hub.subscription;
+package com.HomeConnectPro_hub.subscription;
 
 import com.HomeConnectPro_hub.customer.Customer;
 import com.HomeConnectPro_hub.service.Service;

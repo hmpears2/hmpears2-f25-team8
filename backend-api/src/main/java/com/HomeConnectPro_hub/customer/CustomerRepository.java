@@ -1,4 +1,4 @@
-package main.java.com.HomeConnectPro_hub.customer;
+package com.HomeConnectPro_hub.customer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,8 +1,8 @@
-package main.java.com.HomeConnectPro_hub.review;
+package com.HomeConnectPro_hub.review;
 
-import com.csc340.homeconnect_pro_hub.customer.Customer;
-import com.csc340.homeconnect_pro_hub.service.Service;
-import com.csc340.homeconnect_pro_hub.serviceprovider.ServiceProvider;
+import com.HomeConnectPro_hub.customer.Customer;
+import com.HomeConnectPro_hub.service.Service;
+import com.HomeConnectPro_hub.provider.Provider;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,7 +27,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      * Find reviews for all services by a specific provider
      * Uses Spring Data JPA path traversal: service.provider
      */
-    List<Review> findByServiceProvider(ServiceProvider provider);
+    List<Review> findByServiceProvider(Provider provider);
     
     /**
      * Find reviews by service ID
@@ -72,7 +72,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     /**
      * Count reviews for a provider's services
      */
-    long countByServiceProvider(ServiceProvider provider);
+    long countByServiceProvider(Provider provider);
     
     /**
      * Find reviews with a specific rating for a service
@@ -94,7 +94,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      * Calculate average rating for a provider's services
      */
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.service.provider = :provider")
-    Double findAverageRatingByProvider(@Param("provider") ServiceProvider provider);
+    Double findAverageRatingByProvider(@Param("provider") Provider provider);
     
     /**
      * Get rating distribution for a service (count of each rating 1-5)
@@ -106,7 +106,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      * Get rating distribution for a provider
      */
     @Query("SELECT r.rating, COUNT(r) FROM Review r WHERE r.service.provider = :provider GROUP BY r.rating")
-    List<Object[]> findRatingDistributionByProvider(@Param("provider") ServiceProvider provider);
+    List<Object[]> findRatingDistributionByProvider(@Param("provider") Provider provider);
     
     /**
      * Find recent reviews for a service (limit results)
@@ -116,7 +116,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     /**
      * Find recent reviews for a provider
      */
-    List<Review> findTop10ByServiceProviderOrderByCreatedAtDesc(ServiceProvider provider);
+    List<Review> findTop10ByServiceProviderOrderByCreatedAtDesc(Provider provider);
     
     /**
      * Check if a customer has reviewed a specific service

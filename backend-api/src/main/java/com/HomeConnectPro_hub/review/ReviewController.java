@@ -1,9 +1,9 @@
-package main.java.com.HomeConnectPro_hub.review;
+package com.HomeConnectPro_hub.review;
 
-import com.csc340.homeconnect_pro_hub.customer.CustomerService;
-import com.csc340.homeconnect_pro_hub.service.Service;
-import com.csc340.homeconnect_pro_hub.service.ServiceService;
-import com.csc340.homeconnect_pro_hub.serviceprovider.ServiceProviderService;
+import com.HomeConnectPro_hub.customer.CustomerService;
+import com.HomeConnectPro_hub.service.Service;
+import com.HomeConnectPro_hub.service.ServiceService;
+import com.HomeConnectPro_hub.provider.ProviderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final ServiceService serviceService;
     private final CustomerService customerService;
-    private final ServiceProviderService serviceProviderService;
+    private final ProviderService providerService;
     
     /**
      * Write review for a service (Use Case 2.2.2.7)
@@ -99,7 +99,7 @@ public class ReviewController {
     @GetMapping("/provider/{providerId}")
     public ResponseEntity<List<Review>> getProviderReviews(@PathVariable Long providerId) {
         return ResponseEntity.ok(reviewService.getReviewsByProvider(
-                serviceProviderService.getServiceProviderById(providerId)));
+                providerService.getProviderById(providerId)));
     }
     
     /**
@@ -114,7 +114,7 @@ public class ReviewController {
         
         Map<String, Object> response = new HashMap<>();
         response.put("serviceId", serviceId);
-        response.put("serviceName", service.getServiceName());
+        response.put("serviceName", service.getName());
         response.put("averageRating", averageRating);
         response.put("reviewCount", reviewCount);
         
