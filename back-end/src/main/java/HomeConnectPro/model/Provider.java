@@ -1,10 +1,12 @@
 package HomeConnectPro.model;
 
 import jakarta.persistence.*;
+import org.springframework.http.ResponseEntity;
+import java.util.Optional;
 
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "provider")
+public class Provider {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,7 +18,7 @@ public class User {
     private String address;
     private String password;
     
-    private String userType; // "CUSTOMER" or "PROVIDER"
+    private String userType;
     
     private String businessName;
     private String licenseNumber;
