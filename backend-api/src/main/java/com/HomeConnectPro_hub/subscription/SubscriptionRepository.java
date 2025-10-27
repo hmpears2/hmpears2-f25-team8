@@ -1,8 +1,8 @@
-package main.java.com.HomeConnectPro_hub.subscription;
+package com.HomeConnectPro_hub.subscription;
 
 import com.HomeConnectPro_hub.customer.Customer;
 import com.HomeConnectPro_hub.service.Service;
-import com.HomeConnectPro_hub.serviceprovider.ServiceProvider;
+import com.HomeConnectPro_hub.provider.Provider;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -61,7 +61,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
      * Find all subscriptions for services by a specific provider
      * Uses Spring Data JPA path traversal: service.provider
      */
-    List<Subscription> findByServiceProvider(ServiceProvider provider);
+    List<Subscription> findByServiceProvider(Provider provider);
     
     /**
      * Find all subscriptions for a provider by provider ID
@@ -84,13 +84,13 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
      */
     List<Subscription> findByCustomerOrderBySubscribedAtDesc(Customer customer);
     
-    // /**
-    //  * Custom query to find subscriptions with service and provider details
-    //  * Using JPQL for more complex queries
-    //  */
-    // @Query("SELECT s FROM Subscription s " +
-    //        "JOIN FETCH s.service serv " +
-    //        "JOIN FETCH serv.provider " +
-    //        "WHERE s.customer = :customer")
-    // List<Subscription> findByCustomerWithServiceAndProvider(@Param("customer") Customer customer);
+    /**
+     * Custom query to find subscriptions with service and provider details
+     * Using JPQL for more complex queries
+     */
+    @Query("SELECT s FROM Subscription s " +
+           "JOIN FETCH s.service serv " +
+           "JOIN FETCH serv.provider " +
+           "WHERE s.customer = :customer")
+    List<Subscription> findByCustomerWithServiceAndProvider(@Param("customer") Customer customer);
 }

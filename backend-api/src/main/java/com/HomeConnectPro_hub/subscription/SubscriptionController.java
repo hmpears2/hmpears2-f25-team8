@@ -1,8 +1,7 @@
-package main.java.com.HomeConnectPro_hub.subscription;
+package com.HomeConnectPro_hub.subscription;
 
 import com.HomeConnectPro_hub.customer.CustomerService;
 import com.HomeConnectPro_hub.service.ServiceService;
-import com.HomeConnectPro_hub.serviceprovider.ServiceProviderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,26 +13,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/subscriptions")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class SubscriptionController {
     
     private final SubscriptionService subscriptionService;
     private final ServiceService serviceService;
     private final CustomerService customerService;
-    private final ServiceProviderService serviceProviderService;
-    
-    /**
-     * Subscribe to a service (Use Case 2.2.2.5)
-     * POST /api/subscriptions
-     */
-    @PostMapping
-    public ResponseEntity<Subscription> createSubscription(@Valid @RequestBody Subscription subscription) {
-        Subscription createdSubscription = subscriptionService.createSubscription(subscription);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdSubscription);
-    }
     
     /**
      * Get all subscriptions
-     * GET /api/subscriptions
      */
     @GetMapping
     public ResponseEntity<List<Subscription>> getAllSubscriptions() {
@@ -42,46 +30,50 @@ public class SubscriptionController {
     
     /**
      * Get subscription by ID
-     * GET /api/subscriptions/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Subscription> getSubscription(@PathVariable Long id) {
+    public ResponseEntity<Subscription> getSubscriptionById(@PathVariable Long id) {
         return ResponseEntity.ok(subscriptionService.getSubscriptionById(id));
     }
     
     /**
-     * Get customer's subscriptions (Use Case 2.2.2.6 - View My Subscriptions)
-     * GET /api/subscriptions/customer/{customerId}
+     * Create a new subscription
+     * Use Case 2.2.2.5 - Subscribe to Service
+     */
+    @PostMapping
+    public ResponseEntity<Subscription> createSubscription(@Valid @RequestBody Subscription subscription) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(subscriptionService.createSubscription(subscription));
+    }
+    
+    /**
+     * Get subscriptions by customer ID
+     * Use Case 2.2.2.6 - View My Subscriptions
      */
     @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<Subscription>> getCustomerSubscriptions(@PathVariable Long customerId) {
-        return ResponseEntity.ok(subscriptionService.getSubscriptionsByCustomer(
-                customerService.getCustomerById(customerId)));
+    public ResponseEntity<List<Subscription>> getSubscriptionsByCustomer(@PathVariable Long customerId) {
+        return ResponseEntity.ok(subscriptionService.getSubscriptionsByCustomerId(customerId));
     }
     
     /**
-     * Get subscriptions for a specific service
-     * GET /api/subscriptions/service/{serviceId}
+     * Get subscriptions by service ID
      */
     @GetMapping("/service/{serviceId}")
-    public ResponseEntity<List<Subscription>> getServiceSubscriptions(@PathVariable Long serviceId) {
-        return ResponseEntity.ok(subscriptionService.getSubscriptionsByService(
-                serviceService.getServiceById(serviceId)));
+    public ResponseEntity<List<Subscription>> getSubscriptionsByService(@PathVariable Long serviceId) {
+        return ResponseEntity.ok(subscriptionService.getSubscriptionsByServiceId(serviceId));
     }
     
     /**
-     * Get all subscriptions for a provider's services
-     * GET /api/subscriptions/provider/{providerId}
+     * Get subscriptions by provider ID
+     * Use Case 2.2.1.7 - View Statistics
      */
     @GetMapping("/provider/{providerId}")
-    public ResponseEntity<List<Subscription>> getProviderSubscriptions(@PathVariable Long providerId) {
-        return ResponseEntity.ok(subscriptionService.getSubscriptionsByProvider(
-                serviceProviderService.getServiceProviderById(providerId)));
+    public ResponseEntity<List<Subscription>> getSubscriptionsByProvider(@PathVariable Long providerId) {
+        return ResponseEntity.ok(subscriptionService.getSubscriptionsByProviderId(providerId));
     }
     
     /**
-     * Unsubscribe from a service
-     * DELETE /api/subscriptions/{id}
+     * Delete a subscription (unsubscribe)
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSubscription(@PathVariable Long id) {
@@ -90,14 +82,44 @@ public class SubscriptionController {
     }
     
     /**
-     * Unsubscribe using customer and service IDs
-     * DELETE /api/subscriptions/customer/{customerId}/service/{serviceId}
+     * Delete subscription by customer and service IDs
      */
     @DeleteMapping("/customer/{customerId}/service/{serviceId}")
-    public ResponseEntity<Void> unsubscribeByCustomerAndService(
-            @PathVariable Long customerId, 
+    public ResponseEntity<Void> deleteSubscriptionByCustomerAndService(
+            @PathVariable Long customerId,
             @PathVariable Long serviceId) {
         subscriptionService.deleteSubscriptionByCustomerAndService(customerId, serviceId);
         return ResponseEntity.noContent().build();
+    }
+    
+    /**
+     * Check if customer is subscribed to a service
+     */
+    @GetMapping("/check")
+    public ResponseEntity<Boolean> checkSubscription(
+            @RequestParam Long customerId,
+            @RequestParam Long serviceId) {
+        boolean isSubscribed = subscriptionService.isCustomerSubscribedToService(customerId, serviceId);
+        return ResponseEntity.ok(isSubscribed);
+    }
+    
+    /**
+     * Get subscription count for a customer
+     */
+    @GetMapping("/customer/{customerId}/count")
+    public ResponseEntity<Long> getCustomerSubscriptionCount(@PathVariable Long customerId) {
+        long count = subscriptionService.countSubscriptionsForCustomer(
+                customerService.getCustomerById(customerId));
+        return ResponseEntity.ok(count);
+    }
+    
+    /**
+     * Get subscription count for a service
+     */
+    @GetMapping("/service/{serviceId}/count")
+    public ResponseEntity<Long> getServiceSubscriptionCount(@PathVariable Long serviceId) {
+        long count = subscriptionService.countSubscriptionsForService(
+                serviceService.getServiceById(serviceId));
+        return ResponseEntity.ok(count);
     }
 }

@@ -1,7 +1,7 @@
-package main.java.com.HomeConnectPro_hub.review;
+package com.HomeConnectPro_hub.review;
 
-import com.csc340.homeconnect_pro_hub.customer.Customer;
-import com.csc340.homeconnect_pro_hub.service.Service;
+import com.HomeConnectPro_hub.customer.Customer;
+import com.HomeConnectPro_hub.service.Service;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;

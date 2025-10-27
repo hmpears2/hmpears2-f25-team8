@@ -1,8 +1,6 @@
-package HomeConnectPro.entity;
+package com.HomeConnectPro_hub.provider;
 
 import jakarta.persistence.*;
-import org.springframework.http.ResponseEntity;
-import java.util.Optional;
 
 @Entity
 @Table(name = "provider")

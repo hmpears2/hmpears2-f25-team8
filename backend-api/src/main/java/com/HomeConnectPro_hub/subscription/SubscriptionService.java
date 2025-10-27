@@ -1,10 +1,10 @@
-package main.java.com.HomeConnectPro_hub.subscription;
+package com.HomeConnectPro_hub.subscription;
 
 import com.HomeConnectPro_hub.customer.Customer;
 import com.HomeConnectPro_hub.customer.CustomerService;
 import com.HomeConnectPro_hub.service.Service;
 import com.HomeConnectPro_hub.service.ServiceService;
-import com.HomeConnectPro_hub.serviceprovider.ServiceProvider;
+import com.HomeConnectPro_hub.provider.Provider;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,7 +94,7 @@ public class SubscriptionService {
      * Get all subscriptions for a provider's services
      * Used for provider statistics (Use Case 2.2.1.7)
      */
-    public List<Subscription> getSubscriptionsByProvider(ServiceProvider provider) {
+    public List<Subscription> getSubscriptionsByProvider(Provider provider) {
         return subscriptionRepository.findByServiceProvider(provider);
     }
     

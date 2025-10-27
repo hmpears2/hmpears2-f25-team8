@@ -1,4 +1,4 @@
-package main.java.com.HomeConnectPro_hub.customer;
+package com.HomeConnectPro_hub.customer;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
