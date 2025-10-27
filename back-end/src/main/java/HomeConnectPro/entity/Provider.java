@@ -1,4 +1,4 @@
-package HomeConnectPro.model;
+package HomeConnectPro.entity;
 
 import jakarta.persistence.*;
 import org.springframework.http.ResponseEntity;
