@@ -78,64 +78,6 @@ DELETE /api/customers/{id}
 
 ### Create Service Provider (Sign Up - Use Case 2.2.1.1)
 ```http
-POST /api/providers
-Content-Type: application/json
-
-{
-    "firstName": "Jane",
-    "lastName": "Smith",
-    "email": "jane.smith@example.com",
-    "password": "securePassword123",
-    "phoneNumber": "555-9999",
-    "businessName": "Smith's Professional Plumbing",
-    "primaryServiceCategory": "Plumbing"
-}
-```
-
-### Update Service Provider Profile (Use Case 2.2.1.3)
-```http
-PUT /api/providers/{id}
-Content-Type: application/json
-
-{
-    "firstName": "Jane",
-    "lastName": "Smith",
-    "email": "jane.updated@example.com",
-    "phoneNumber": "555-8888",
-    "businessName": "Smith's Professional Plumbing & HVAC",
-    "primaryServiceCategory": "Plumbing & HVAC"
-}
-```
-
-### Get Service Provider by ID
-```http
-GET /api/providers/{id}
-```
-
-### Get Service Provider by Email (Login - Use Case 2.2.1.2)
-```http
-GET /api/providers/email/{email}
-```
-
-### Get All Service Providers
-```http
-GET /api/providers
-```
-
-### Search Providers by Business Name
-```http
-GET /api/providers/search/business?name={searchTerm}
-```
-
-### Search Providers by Service Category
-```http
-GET /api/providers/search/category?category={category}
-```
-
-### Delete Service Provider
-```http
-DELETE /api/providers/{id}
-```
 
 ---
 
@@ -653,5 +595,3 @@ PUT /api/services/1
 ```
 http://localhost:8080
 ```
-
-**For production deployment, update base URL accordingly.**
