@@ -3,7 +3,6 @@ package com.HomeConnectPro_hub.review;
 import com.HomeConnectPro_hub.customer.CustomerService;
 import com.HomeConnectPro_hub.service.Service;
 import com.HomeConnectPro_hub.service.ServiceService;
-import com.HomeConnectPro_hub.provider.ProviderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,7 +21,6 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final ServiceService serviceService;
     private final CustomerService customerService;
-    private final ProviderService providerService;
     
     /**
      * Write review for a service (Use Case 2.2.2.7)
