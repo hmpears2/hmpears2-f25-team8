@@ -96,11 +96,11 @@ public class ReviewController {
      * Get all reviews for a provider's services
      * GET /api/reviews/provider/{providerId}
      */
-    @GetMapping("/provider/{providerId}")
-    public ResponseEntity<List<Review>> getProviderReviews(@PathVariable Long providerId) {
-        return ResponseEntity.ok(reviewService.getReviewsByProvider(
-                providerService.getProviderById(providerId)));
-    }
+    // @GetMapping("/provider/{providerId}")
+    // public ResponseEntity<List<Review>> getProviderReviews(@PathVariable Long providerId) {
+    //     return ResponseEntity.ok(reviewService.getReviewsByProvider(
+    //             providerService.getProviderById(providerId)));
+    // }
     
     /**
      * Get average rating for a service

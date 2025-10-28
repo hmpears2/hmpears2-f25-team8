@@ -1,7 +1,6 @@
 package com.HomeConnectPro_hub.provider;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,76 +8,50 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/providers")
-@RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@RequestMapping("/providers")
+@CrossOrigin(origins = "http://localhost:5175")
 public class ProviderController {
     
-    private final ProviderService providerService;
+    @Autowired
+    private ProviderService ProviderService;
     
-    /**
-     * Register a new provider
-     */
     @PostMapping("/register")
-    public ResponseEntity<Provider> registerProvider(@RequestBody Provider provider) {
-        Provider savedProvider = providerService.saveProvider(provider);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedProvider);
+    public ResponseEntity<Provider> registerProvider(@RequestBody Provider provider){
+        Provider savedProvider = ProviderService.saveProvider(provider);
+        return ResponseEntity.ok(savedProvider);
     }
     
-    /**
-     * Provider login
-     */
     @PostMapping("/login")
     public ResponseEntity<Provider> login(@RequestBody Provider loginRequest) {
-        Optional<Provider> provider = providerService.findByEmailAndPassword(
-                loginRequest.getEmail(), 
-                loginRequest.getPassword()
-        );
-        return provider.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+        Optional<Provider> provider = ProviderService.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
+        return provider.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
     
-    /**
-     * Get provider by ID
-     */
     @GetMapping("/{id}")
     public ResponseEntity<Provider> getProvider(@PathVariable Long id) {
-        return ResponseEntity.ok(providerService.getProviderById(id));
+        Optional<Provider> provider = ProviderService.getProviderById(id);
+        if (provider.isEmpty()) {
+            return ResponseEntity.notFound().build(); 
+        } else {
+            return ResponseEntity.ok(provider.get());
+        }
     }
     
-    /**
-     * Get all providers
-     */
-    @GetMapping
-    public ResponseEntity<List<Provider>> getAllProviders() {
-        return ResponseEntity.ok(providerService.findAllProviders());
+    @GetMapping("/providers")
+    public List<Provider> getAllProviders() {
+        return ProviderService.findAllProviders();
     }
     
-    /**
-     * Get all active providers
-     */
-    @GetMapping("/active")
-    public ResponseEntity<List<Provider>> getActiveProviders() {
-        return ResponseEntity.ok(providerService.getActiveProviders());
-    }
-    
-    /**
-     * Update provider
-     */
     @PutMapping("/{id}")
-    public ResponseEntity<Provider> updateProvider(
-            @PathVariable Long id, 
-            @RequestBody Provider provider) {
-        Provider updatedProvider = providerService.updateProvider(id, provider);
+    public ResponseEntity<Provider> updateProvider(@PathVariable Long id, @RequestBody Provider provider) {
+        provider.setId(id);
+        Provider updatedProvider = ProviderService.saveProvider(provider);
         return ResponseEntity.ok(updatedProvider);
     }
     
-    /**
-     * Delete provider
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProvider(@PathVariable Long id) {
-        providerService.deleteProvider(id);
+        ProviderService.deleteProvider(id);
         return ResponseEntity.noContent().build();
     }
 }
