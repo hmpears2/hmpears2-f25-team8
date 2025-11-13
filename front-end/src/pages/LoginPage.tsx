@@ -1,25 +1,39 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { providerService } from '../services/providerApi';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [userType, setUserType] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email || !password || !userType) {
-      alert('Please fill in all fields');
+      setError('Please fill in all fields');
       return;
     }
     
-    // Demo mode - redirect based on user type
-    if (userType === 'customer') {
-      navigate('/customer-dashboard');
-    } else if (userType === 'provider') {
-      navigate('/provider-dashboard');
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      if (userType === 'customer') {
+        navigate('/customer-dashboard');
+      } else if (userType === 'provider') {
+        const result = await providerService.login({ email, password });
+        localStorage.setItem('providerId', result.id?.toString() || '');
+        localStorage.setItem('providerData', JSON.stringify(result));
+        navigate('/provider-dashboard');
+      }
+    } catch (err: any) {
+      setError(err.response?.status === 404 ? 'Invalid email or password' : 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -69,6 +83,11 @@ const LoginPage: React.FC = () => {
                 </div>
 
                 <form onSubmit={handleSubmit}>
+                  {error && (
+                    <div className="alert alert-danger" role="alert">
+                      {error}
+                    </div>
+                  )}
                   <div className="mb-3">
                     <div className="input-group">
                       <input 
@@ -119,8 +138,8 @@ const LoginPage: React.FC = () => {
                     </div>
                   </div>
                   
-                  <button type="submit" className="btn btn-primary w-100 mb-3 btn-lg">
-                    LOGIN
+                  <button type="submit" className="btn btn-primary w-100 mb-3 btn-lg" disabled={isLoading}>
+                    {isLoading ? 'LOGGING IN...' : 'LOGIN'}
                   </button>
                 </form>
               </div>

@@ -1,9 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { providerService, type Provider } from '../services/providerApi';
 
 const ProviderDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
+  const [providerData, setProviderData] = useState<Provider | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProviderData = () => {
+      const storedData = localStorage.getItem('providerData');
+      const storedId = localStorage.getItem('providerId');
+      
+      if (storedData) {
+        setProviderData(JSON.parse(storedData));
+        setIsLoading(false);
+      } else if (storedId) {
+        fetchProviderData(parseInt(storedId));
+      } else {
+        navigate('/');
+      }
+    };
+
+    const fetchProviderData = async (id: number) => {
+      try {
+        const data = await providerService.getProvider(id);
+        setProviderData(data);
+        localStorage.setItem('providerData', JSON.stringify(data));
+      } catch (error) {
+        console.error('Error fetching provider data:', error);
+        navigate('/');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProviderData();
+  }, [navigate]);
 
   const showSection = (section: string) => {
     setActiveSection(section);
@@ -34,14 +68,42 @@ const ProviderDashboard: React.FC = () => {
     }
   };
 
-  const removeProfile = () => {
+  const removeProfile = async () => {
     if (confirm('Are you sure you want to remove your provider profile? This action cannot be undone.')) {
-      alert('Provider profile has been removed. You will be redirected to the login page.');
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
+      if (providerData?.id) {
+        try {
+          await providerService.deleteProvider(providerData.id);
+          localStorage.removeItem('providerId');
+          localStorage.removeItem('providerData');
+          alert('Provider profile has been removed. You will be redirected to the login page.');
+          navigate('/');
+        } catch (error) {
+          console.error('Error deleting provider:', error);
+          alert('Failed to delete profile. Please try again.');
+        }
+      }
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="spinner-border text-warning" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!providerData) {
+    return (
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="alert alert-danger">
+          Failed to load provider data. Please try logging in again.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-light">
@@ -105,8 +167,8 @@ const ProviderDashboard: React.FC = () => {
         <div className="container-fluid py-4">
           {/* Welcome Section */}
           <div className="alert alert-warning border-0 mb-4">
-            <h1 className="alert-heading h2 mb-2 text-dark">Welcome back, Mike!</h1>
-            <p className="mb-0 text-dark">Mike's Plumbing Services • 4.9 ⭐ Rating • 127 Reviews</p>
+            <h1 className="alert-heading h2 mb-2 text-dark">Welcome back, {providerData.businessName}!</h1>
+            <p className="mb-0 text-dark">{providerData.businessName} • {providerData.yearsExperience} years in business</p>
           </div>
 
           {/* Quick Actions */}
@@ -321,39 +383,39 @@ const ProviderDashboard: React.FC = () => {
           <div className="card">
             <div className="card-body">
               <form onSubmit={(e) => { e.preventDefault(); alert('Provider profile updated successfully!'); }}>
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label">First Name</label>
-                    <input type="text" className="form-control" defaultValue="Mike" required />
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label">Last Name</label>
-                    <input type="text" className="form-control" defaultValue="Johnson" required />
-                  </div>
-                </div>
                 <div className="mb-3">
                   <label className="form-label">Business Name</label>
-                  <input type="text" className="form-control" defaultValue="Mike's Plumbing Services" required />
+                  <input type="text" className="form-control" defaultValue={providerData.businessName} required />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Email</label>
-                  <input type="email" className="form-control" defaultValue="mike@mikesplumbing.com" required />
+                  <input type="email" className="form-control" defaultValue={providerData.email} required />
+                </div>
+                <div className="row">
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label">Phone Number</label>
+                    <input type="tel" className="form-control" defaultValue={providerData.phone} required />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label">Years Experience</label>
+                    <input type="number" className="form-control" defaultValue={providerData.yearsExperience} required />
+                  </div>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Phone</label>
-                  <input type="tel" className="form-control" defaultValue="(555) 987-6543" required />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Business Address</label>
-                  <input type="text" className="form-control" defaultValue="456 Main Street" required />
+                  <label className="form-label">Address</label>
+                  <input type="text" className="form-control" defaultValue={providerData.address} required />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">License Number</label>
-                  <input type="text" className="form-control" defaultValue="PL-2024-5678" required />
+                  <input type="text" className="form-control" defaultValue={providerData.licenseNumber} required />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Years of Experience</label>
-                  <input type="number" className="form-control" defaultValue="15" required />
+                  <label className="form-label">Primary Service</label>
+                  <input type="text" className="form-control" defaultValue={providerData.primaryService} required />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Business Hours</label>
+                  <input type="text" className="form-control" defaultValue="Mon-Fri 9AM-5PM" required />
                 </div>
                 <div className="btn-group">
                   <button type="submit" className="btn btn-primary">Update Profile</button>
