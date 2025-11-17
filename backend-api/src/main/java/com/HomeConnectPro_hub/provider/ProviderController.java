@@ -9,7 +9,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/providers")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(
+    origins = "http://localhost:5175",
+    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
+    allowedHeaders = "*",
+    allowCredentials = "true"
+)
 public class ProviderController {
     
     @Autowired
