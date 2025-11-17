@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { providerService } from '../services/providerApi';
 
 const ProviderSignup: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ const ProviderSignup: React.FC = () => {
     agreeTerms: false,
     confirmLicense: false
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -36,32 +39,52 @@ const ProviderSignup: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
     if (!formData.firstName || !formData.lastName || !formData.businessName || 
         !formData.primaryService || !formData.email || !formData.phone || 
         !formData.businessAddress || !formData.licenseNumber || 
         !formData.yearsExperience || !formData.password || !formData.confirmPassword) {
-      alert('Please fill in all fields');
+      setError('Please fill in all fields');
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
 
     if (!formData.agreeTerms || !formData.confirmLicense) {
-      alert('Please agree to the terms and confirm your license status');
+      setError('Please agree to the terms and confirm your license status');
       return;
     }
 
-    alert('Provider profile created successfully! Redirecting to dashboard...');
-    setTimeout(() => {
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const providerData = {
+        businessName: formData.businessName,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        address: formData.businessAddress,
+        licenseNumber: formData.licenseNumber,
+        primaryService: formData.primaryService,
+        yearsExperience: parseInt(formData.yearsExperience),
+        userType: 'provider'
+      };
+
+      const result = await providerService.register(providerData);
+      localStorage.setItem('providerId', result.id?.toString() || '');
+      localStorage.setItem('providerData', JSON.stringify(result));
       navigate('/provider-dashboard');
-    }, 1500);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -107,6 +130,11 @@ const ProviderSignup: React.FC = () => {
                 </div>
 
                 <form onSubmit={handleSubmit}>
+                  {error && (
+                    <div className="alert alert-danger" role="alert">
+                      {error}
+                    </div>
+                  )}
                   <div className="row">
                     <div className="col-md-6 mb-3">
                       <div className="input-group">
@@ -336,8 +364,8 @@ const ProviderSignup: React.FC = () => {
                     </div>
                   </div>
 
-                  <button type="submit" className="btn btn-warning btn-lg w-100 mb-3 text-dark fw-bold">
-                    CREATE PROVIDER PROFILE
+                  <button type="submit" className="btn btn-warning btn-lg w-100 mb-3 text-dark fw-bold" disabled={isLoading}>
+                    {isLoading ? 'CREATING PROFILE...' : 'CREATE PROVIDER PROFILE'}
                   </button>
                 </form>
 

@@ -1,47 +1,111 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { providerService, type Provider } from '../services/providerApi';
 
 const ProviderDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
+  const [providerData, setProviderData] = useState<Provider | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProviderData = () => {
+      const storedData = localStorage.getItem('providerData');
+      const storedId = localStorage.getItem('providerId');
+      
+      if (storedData) {
+        setProviderData(JSON.parse(storedData));
+        setIsLoading(false);
+      } else if (storedId) {
+        fetchProviderData(parseInt(storedId));
+      } else {
+        navigate('/');
+      }
+    };
+
+    const fetchProviderData = async (id: number) => {
+      try {
+        const data = await providerService.getProvider(id);
+        setProviderData(data);
+        localStorage.setItem('providerData', JSON.stringify(data));
+      } catch (error) {
+        console.error('Error fetching provider data:', error);
+        navigate('/');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProviderData();
+  }, [navigate]);
 
   const showSection = (section: string) => {
     setActiveSection(section);
   };
 
-  const createService = () => {
-    const serviceName = prompt('Enter service name:');
-    const serviceDescription = prompt('Enter service description:');
-    const servicePrice = prompt('Enter hourly rate:');
-    
-    if (serviceName && serviceDescription && servicePrice) {
-      alert(`Service "${serviceName}" created successfully!\nDescription: ${serviceDescription}\nRate: ${servicePrice}/hour`);
-    }
-  };
-
-  const editService = (serviceName: string) => {
-    const newDescription = prompt(`Edit description for ${serviceName}:`);
-    const newPrice = prompt(`Edit price for ${serviceName}:`);
-    
-    if (newDescription && newPrice) {
-      alert(`${serviceName} updated successfully!`);
-    }
-  };
-
-  const removeService = (serviceName: string) => {
-    if (confirm(`Are you sure you want to remove "${serviceName}"?`)) {
-      alert(`${serviceName} has been removed.`);
-    }
-  };
-
-  const removeProfile = () => {
+  const removeProfile = async () => {
     if (confirm('Are you sure you want to remove your provider profile? This action cannot be undone.')) {
-      alert('Provider profile has been removed. You will be redirected to the login page.');
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
+      if (providerData?.id) {
+        try {
+          await providerService.deleteProvider(providerData.id);
+          localStorage.removeItem('providerId');
+          localStorage.removeItem('providerData');
+          alert('Provider profile has been removed. You will be redirected to the login page.');
+          navigate('/');
+        } catch (error) {
+          console.error('Error deleting provider:', error);
+          alert('Failed to delete profile. Please try again.');
+        }
+      }
     }
   };
+
+  const updateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!providerData?.id) return;
+
+    const formData = new FormData(e.currentTarget);
+    const updatedProvider = {
+      businessName: formData.get('businessName') as string,
+      email: formData.get('email') as string,
+      phone: formData.get('phone') as string,
+      yearsExperience: parseInt(formData.get('yearsExperience') as string),
+      address: formData.get('address') as string,
+      licenseNumber: formData.get('licenseNumber') as string,
+      primaryService: formData.get('primaryService') as string,
+    };
+
+    try {
+      const result = await providerService.updateProvider(providerData.id, updatedProvider);
+      setProviderData(result);
+      localStorage.setItem('providerData', JSON.stringify(result));
+      alert('Provider profile updated successfully!');
+    } catch (error) {
+      console.error('Error updating provider:', error);
+      alert('Failed to update profile. Please try again.');
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="spinner-border text-warning" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!providerData) {
+    return (
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="alert alert-danger">
+          Failed to load provider data. Please try logging in again.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-light">
@@ -88,7 +152,7 @@ const ProviderDashboard: React.FC = () => {
             </ul>
             <div className="dropdown">
               <button className="btn btn-outline-dark dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
-                <i className="bi bi-tools fs-5 me-2"></i>Mike Johnson
+                <i className="bi bi-tools fs-5 me-2"></i>{providerData.businessName}
               </button>
               <ul className="dropdown-menu">
                 <li><button className="dropdown-item" onClick={() => showSection('profile')}><i className="bi bi-gear me-2"></i>Modify Profile</button></li>
@@ -105,8 +169,8 @@ const ProviderDashboard: React.FC = () => {
         <div className="container-fluid py-4">
           {/* Welcome Section */}
           <div className="alert alert-warning border-0 mb-4">
-            <h1 className="alert-heading h2 mb-2 text-dark">Welcome back, Mike!</h1>
-            <p className="mb-0 text-dark">Mike's Plumbing Services • 4.9 ⭐ Rating • 127 Reviews</p>
+            <h1 className="alert-heading h2 mb-2 text-dark">Welcome back, {providerData.businessName}!</h1>
+            <p className="mb-0 text-dark">{providerData.businessName} • {providerData.yearsExperience} years in business</p>
           </div>
 
           {/* Quick Actions */}
@@ -159,36 +223,11 @@ const ProviderDashboard: React.FC = () => {
         <div className="container-fluid py-4">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h2>My Services</h2>
-            <button className="btn btn-primary" onClick={createService}>Create New Service</button>
           </div>
           
-          <div className="row g-3">
-            <div className="col-md-6 col-lg-4">
-              <div className="card">
-                <div className="card-body">
-                  <h5 className="card-title">Emergency Plumbing</h5>
-                  <p className="card-text">24/7 emergency plumbing repairs</p>
-                  <p className="text-primary fw-bold">$75/hour</p>
-                  <div className="btn-group">
-                    <button className="btn btn-sm btn-outline-primary" onClick={() => editService('Emergency Plumbing')}>Edit</button>
-                    <button className="btn btn-sm btn-outline-danger" onClick={() => removeService('Emergency Plumbing')}>Remove</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-6 col-lg-4">
-              <div className="card">
-                <div className="card-body">
-                  <h5 className="card-title">Pipe Installation</h5>
-                  <p className="card-text">Professional pipe installation and repair</p>
-                  <p className="text-primary fw-bold">$50/hour</p>
-                  <div className="btn-group">
-                    <button className="btn btn-sm btn-outline-primary" onClick={() => editService('Pipe Installation')}>Edit</button>
-                    <button className="btn btn-sm btn-outline-danger" onClick={() => removeService('Pipe Installation')}>Remove</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="alert alert-info">
+            <h4>Services Management</h4>
+            <p>Service management features are coming soon. You can currently view your primary service: <strong>{providerData.primaryService}</strong></p>
           </div>
         </div>
       )}
@@ -197,75 +236,9 @@ const ProviderDashboard: React.FC = () => {
       {activeSection === 'statistics' && (
         <div className="container-fluid py-4">
           <h2 className="mb-4">Customer Statistics</h2>
-          <div className="row g-3">
-            <div className="col-lg-3 col-md-6">
-              <div className="card bg-white border-primary shadow-sm">
-                <div className="card-body text-center">
-                  <i className="bi bi-people fs-1 text-primary mb-3"></i>
-                  <h3 className="text-dark">45</h3>
-                  <p className="text-muted mb-0">Total Customers</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-md-6">
-              <div className="card bg-white border-success shadow-sm">
-                <div className="card-body text-center">
-                  <i className="bi bi-graph-up fs-1 text-success mb-3"></i>
-                  <h3 className="text-dark">12</h3>
-                  <p className="text-muted mb-0">This Month</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-md-6">
-              <div className="card bg-white border-warning shadow-sm">
-                <div className="card-body text-center">
-                  <i className="bi bi-star fs-1 text-warning mb-3"></i>
-                  <h3 className="text-dark">4.9</h3>
-                  <p className="text-muted mb-0">Average Rating</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-md-6">
-              <div className="card bg-white border-info shadow-sm">
-                <div className="card-body text-center">
-                  <i className="bi bi-bookmark-check fs-1 text-info mb-3"></i>
-                  <h3 className="text-dark">127</h3>
-                  <p className="text-muted mb-0">Total Reviews</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="row mt-4">
-            <div className="col-12">
-              <div className="card">
-                <div className="card-header">
-                  <h5 className="mb-0">Recent Customer Activity</h5>
-                </div>
-                <div className="card-body">
-                  <div className="list-group">
-                    <div className="list-group-item">
-                      <div className="d-flex justify-content-between">
-                        <span>John Smith subscribed to Emergency Plumbing</span>
-                        <small className="text-muted">2 hours ago</small>
-                      </div>
-                    </div>
-                    <div className="list-group-item">
-                      <div className="d-flex justify-content-between">
-                        <span>Sarah Williams left a 5-star review</span>
-                        <small className="text-muted">1 day ago</small>
-                      </div>
-                    </div>
-                    <div className="list-group-item">
-                      <div className="d-flex justify-content-between">
-                        <span>Robert Chen subscribed to Pipe Installation</span>
-                        <small className="text-muted">3 days ago</small>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="alert alert-info">
+            <h4>Statistics Dashboard</h4>
+            <p>Customer statistics and analytics features are coming soon. This will show your total customers, monthly growth, ratings, and reviews.</p>
           </div>
         </div>
       )}
@@ -274,42 +247,9 @@ const ProviderDashboard: React.FC = () => {
       {activeSection === 'reviews' && (
         <div className="container-fluid py-4">
           <h2 className="mb-4">Customer Reviews</h2>
-          <div className="row g-3">
-            <div className="col-12">
-              <div className="card">
-                <div className="card-body">
-                  <div className="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                      <h6 className="mb-1">Sarah Williams</h6>
-                      <div className="text-warning mb-1">⭐⭐⭐⭐⭐</div>
-                      <p className="mb-2">"Excellent work! Mike was professional and fixed our pipe issue quickly."</p>
-                      <small className="text-muted">2 days ago</small>
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <button className="btn btn-outline-primary btn-sm">Reply</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="col-12">
-              <div className="card">
-                <div className="card-body">
-                  <div className="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                      <h6 className="mb-1">David Wilson</h6>
-                      <div className="text-warning mb-1">⭐⭐⭐⭐⭐</div>
-                      <p className="mb-2">"Great service and fair pricing. Will definitely call again!"</p>
-                      <small className="text-muted">1 week ago</small>
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <button className="btn btn-outline-primary btn-sm">Reply</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="alert alert-info">
+            <h4>Reviews Management</h4>
+            <p>Customer reviews and rating features are coming soon. You will be able to view and respond to customer feedback here.</p>
           </div>
         </div>
       )}
@@ -320,40 +260,40 @@ const ProviderDashboard: React.FC = () => {
           <h2 className="mb-4">Provider Profile</h2>
           <div className="card">
             <div className="card-body">
-              <form onSubmit={(e) => { e.preventDefault(); alert('Provider profile updated successfully!'); }}>
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label">First Name</label>
-                    <input type="text" className="form-control" defaultValue="Mike" required />
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label">Last Name</label>
-                    <input type="text" className="form-control" defaultValue="Johnson" required />
-                  </div>
-                </div>
+              <form onSubmit={updateProfile}>
                 <div className="mb-3">
                   <label className="form-label">Business Name</label>
-                  <input type="text" className="form-control" defaultValue="Mike's Plumbing Services" required />
+                  <input type="text" className="form-control" name="businessName" defaultValue={providerData.businessName} required />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Email</label>
-                  <input type="email" className="form-control" defaultValue="mike@mikesplumbing.com" required />
+                  <input type="email" className="form-control" name="email" defaultValue={providerData.email} required />
+                </div>
+                <div className="row">
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label">Phone Number</label>
+                    <input type="tel" className="form-control" name="phone" defaultValue={providerData.phone} required />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label">Years Experience</label>
+                    <input type="number" className="form-control" name="yearsExperience" defaultValue={providerData.yearsExperience} required />
+                  </div>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Phone</label>
-                  <input type="tel" className="form-control" defaultValue="(555) 987-6543" required />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Business Address</label>
-                  <input type="text" className="form-control" defaultValue="456 Main Street" required />
+                  <label className="form-label">Address</label>
+                  <input type="text" className="form-control" name="address" defaultValue={providerData.address} required />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">License Number</label>
-                  <input type="text" className="form-control" defaultValue="PL-2024-5678" required />
+                  <input type="text" className="form-control" name="licenseNumber" defaultValue={providerData.licenseNumber} required />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Years of Experience</label>
-                  <input type="number" className="form-control" defaultValue="15" required />
+                  <label className="form-label">Primary Service</label>
+                  <input type="text" className="form-control" name="primaryService" defaultValue={providerData.primaryService} required />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Business Hours</label>
+                  <input type="text" className="form-control" name="businessHours" defaultValue="Mon-Fri 9AM-5PM" required />
                 </div>
                 <div className="btn-group">
                   <button type="submit" className="btn btn-primary">Update Profile</button>
