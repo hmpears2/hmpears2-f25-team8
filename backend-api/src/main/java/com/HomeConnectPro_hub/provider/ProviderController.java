@@ -11,7 +11,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/providers")
 @CrossOrigin(
-    origins = "http://localhost:5175",
+    origins = "http://localhost:5173",
     methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
     allowedHeaders = "*",
     allowCredentials = "true"
