@@ -9,6 +9,7 @@ import com.HomeConnectPro_hub.subscription.SubscriptionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.lang.NonNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,16 +33,18 @@ public class ReviewService {
     public Review createReview(Review review) {
 
         Customer customer = review.getCustomer();
-        if (customer == null || customer.getId() == null) {
-            throw new IllegalArgumentException("Customer is required");
+        Long customerId = customer.getId();
+        if (customerId == null) {
+            throw new IllegalArgumentException("Customer ID cannot be null");
         }
-        customerService.getCustomerById(customer.getId());
-        
-        Service service = review.getService();
-        if (service == null || service.getId() == null) {
+        customerService.getCustomerById(customerId);
+
+       Service service = review.getService();
+        Long serviceId = service.getId();
+        if (service == null || serviceId == null) {
             throw new IllegalArgumentException("Service is required");
         }
-        serviceService.getServiceById(service.getId());
+        serviceService.getServiceById(serviceId);
         
         if (!subscriptionService.isCustomerSubscribedToService(customer.getId(), service.getId())) {
             throw new RuntimeException("Customer must be subscribed to the service to write a review");
@@ -64,7 +67,7 @@ public class ReviewService {
     /**
      * Get review by ID
      */
-    public Review getReviewById(Long id) {
+    public Review getReviewById(@NonNull Long id) {
         return reviewRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Review not found with id: " + id));
     }
@@ -72,7 +75,7 @@ public class ReviewService {
     /**
      * Update existing review
      */
-    public Review updateReview(Long id, Review reviewDetails) {
+    public Review updateReview(@NonNull Long id, Review reviewDetails) {
         Review review = getReviewById(id);
         
         // Update rating and comment
@@ -90,7 +93,7 @@ public class ReviewService {
     /**
      * Delete review
      */
-    public void deleteReview(Long id) {
+    public void deleteReview(@NonNull Long id) {
         if (!reviewRepository.existsById(id)) {
             throw new EntityNotFoundException("Review not found with id: " + id);
         }

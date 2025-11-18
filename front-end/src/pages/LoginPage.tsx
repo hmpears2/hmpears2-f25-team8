@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { providerService } from '../services/providerApi';
+import { api } from '../services/api';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -23,15 +23,34 @@ const LoginPage: React.FC = () => {
     
     try {
       if (userType === 'customer') {
+        // ✅ FIXED: Actually call the API to verify customer login
+        console.log('Attempting customer login...', { email });
+        const customerData = await api.loginCustomer(email, password);
+        console.log('Customer login successful:', customerData);
+        
+        // Save customer data to localStorage
+        localStorage.setItem('customerId', customerData.id?.toString() || '');
+        localStorage.setItem('customer', JSON.stringify(customerData));
+        
+        // Navigate to customer dashboard
         navigate('/customer-dashboard');
+        
       } else if (userType === 'provider') {
-        const result = await providerService.login({ email, password });
-        localStorage.setItem('providerId', result.id?.toString() || '');
-        localStorage.setItem('providerData', JSON.stringify(result));
+        // ✅ FIXED: Use the correct API method for provider login
+        console.log('Attempting provider login...', { email });
+        const providerData = await api.loginProvider(email, password);
+        console.log('Provider login successful:', providerData);
+        
+        // Save provider data to localStorage
+        localStorage.setItem('providerId', providerData.id?.toString() || '');
+        localStorage.setItem('provider', JSON.stringify(providerData));
+        
+        // Navigate to provider dashboard
         navigate('/provider-dashboard');
       }
     } catch (err: any) {
-      setError(err.response?.status === 404 ? 'Invalid email or password' : 'Login failed. Please try again.');
+      console.error('Login error:', err);
+      setError(err.message || 'Login failed. Please check your credentials and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -84,8 +103,14 @@ const LoginPage: React.FC = () => {
 
                 <form onSubmit={handleSubmit}>
                   {error && (
-                    <div className="alert alert-danger" role="alert">
+                    <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                      <i className="bi bi-exclamation-triangle-fill me-2"></i>
                       {error}
+                      <button 
+                        type="button" 
+                        className="btn-close" 
+                        onClick={() => setError('')}
+                      ></button>
                     </div>
                   )}
                   <div className="mb-3">
@@ -139,7 +164,14 @@ const LoginPage: React.FC = () => {
                   </div>
                   
                   <button type="submit" className="btn btn-primary w-100 mb-3 btn-lg" disabled={isLoading}>
-                    {isLoading ? 'LOGGING IN...' : 'LOGIN'}
+                    {isLoading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2"></span>
+                        LOGGING IN...
+                      </>
+                    ) : (
+                      'LOGIN'
+                    )}
                   </button>
                 </form>
               </div>

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class ServiceController {
      * Get service by ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Service> getServiceById(@PathVariable Long id) {
+    public ResponseEntity<Service> getServiceById(@PathVariable @NonNull Long id) {
         return ResponseEntity.ok(serviceService.getServiceById(id));
     }
     
@@ -45,8 +46,8 @@ public class ServiceController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<Service> updateService(
-            @PathVariable Long id,
-            @RequestBody Service service) {
+            @PathVariable @NonNull Long id,
+            @RequestBody @NonNull Service service) {
         return ResponseEntity.ok(serviceService.updateService(id, service));
     }
     
@@ -54,7 +55,7 @@ public class ServiceController {
      * Delete a service
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteService(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteService(@PathVariable @NonNull Long id) {
         serviceService.deleteService(id);
         return ResponseEntity.noContent().build();
     }
@@ -79,7 +80,7 @@ public class ServiceController {
      * Deactivate a service
      */
     @PutMapping("/{id}/deactivate")
-    public ResponseEntity<Service> deactivateService(@PathVariable Long id) {
+    public ResponseEntity<Service> deactivateService(@PathVariable @NonNull Long id) {
         return ResponseEntity.ok(serviceService.deactivateService(id));
     }
     
@@ -87,7 +88,7 @@ public class ServiceController {
      * Activate a service
      */
     @PutMapping("/{id}/activate")
-    public ResponseEntity<Service> activateService(@PathVariable Long id) {
+    public ResponseEntity<Service> activateService(@PathVariable @NonNull Long id) {
         return ResponseEntity.ok(serviceService.activateService(id));
     }
     

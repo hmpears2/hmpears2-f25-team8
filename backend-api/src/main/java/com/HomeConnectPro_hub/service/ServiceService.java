@@ -5,6 +5,7 @@ import com.HomeConnectPro_hub.provider.ProviderService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -25,7 +26,11 @@ public class ServiceService {
         if (service.getProvider() == null || service.getProvider().getId() == null) {
             throw new IllegalArgumentException("Provider is required");
         }
-        providerService.getProviderById(service.getProvider().getId());
+        Long providerId = service.getProvider().getId();
+        if (providerId == null) {
+            throw new IllegalArgumentException("Provider ID cannot be null");
+        }
+        providerService.getProviderById(providerId);
         
         return serviceRepository.save(service);
     }
@@ -40,7 +45,7 @@ public class ServiceService {
     /**
      * Get service by ID
      */
-    public com.HomeConnectPro_hub.service.Service getServiceById(Long id) {
+    public com.HomeConnectPro_hub.service.Service getServiceById(@NonNull Long id) {
         return serviceRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Service not found with id: " + id));
     }
@@ -76,9 +81,10 @@ public class ServiceService {
     /**
      * Update a service
      */
-    public com.HomeConnectPro_hub.service.Service updateService(Long id, com.HomeConnectPro_hub.service.Service serviceDetails) {
+    @SuppressWarnings("null")
+    public com.HomeConnectPro_hub.service.Service updateService(@NonNull Long id, @NonNull com.HomeConnectPro_hub.service.Service serviceDetails) {
         com.HomeConnectPro_hub.service.Service service = getServiceById(id);
-        
+
         if (serviceDetails.getName() != null) {
             service.setName(serviceDetails.getName());
         }
@@ -98,7 +104,8 @@ public class ServiceService {
     /**
      * Delete a service
      */
-    public void deleteService(Long id) {
+    @SuppressWarnings("null")
+    public void deleteService(@NonNull Long id) {
         com.HomeConnectPro_hub.service.Service service = getServiceById(id);
         serviceRepository.delete(service);
     }
@@ -106,7 +113,7 @@ public class ServiceService {
     /**
      * Deactivate a service (soft delete)
      */
-    public com.HomeConnectPro_hub.service.Service deactivateService(Long id) {
+    public com.HomeConnectPro_hub.service.Service deactivateService(@NonNull Long id) {
         com.HomeConnectPro_hub.service.Service service = getServiceById(id);
         service.setActive(false);
         return serviceRepository.save(service);
@@ -115,7 +122,7 @@ public class ServiceService {
     /**
      * Activate a service
      */
-    public com.HomeConnectPro_hub.service.Service activateService(Long id) {
+    public com.HomeConnectPro_hub.service.Service activateService(@NonNull Long id) {
         com.HomeConnectPro_hub.service.Service service = getServiceById(id);
         service.setActive(true);
         return serviceRepository.save(service);

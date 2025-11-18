@@ -3,6 +3,7 @@ package com.HomeConnectPro_hub.provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +11,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/providers")
 @CrossOrigin(
-    origins = "http://localhost:5175",
+    origins = "http://localhost:5173",
     methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
     allowedHeaders = "*",
     allowCredentials = "true"
@@ -21,7 +22,7 @@ public class ProviderController {
     private ProviderService ProviderService;
     
     @PostMapping("/register")
-    public ResponseEntity<Provider> registerProvider(@RequestBody Provider provider){
+    public ResponseEntity<Provider> registerProvider(@RequestBody @NonNull Provider provider){
         Provider savedProvider = ProviderService.saveProvider(provider);
         return ResponseEntity.ok(savedProvider);
     }
@@ -33,7 +34,7 @@ public class ProviderController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Provider> getProvider(@PathVariable Long id) {
+    public ResponseEntity<Provider> getProvider(@PathVariable @NonNull Long id) {
         Optional<Provider> provider = ProviderService.getProviderById(id);
         if (provider.isEmpty()) {
             return ResponseEntity.notFound().build(); 
@@ -55,7 +56,7 @@ public class ProviderController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProvider(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProvider(@PathVariable @NonNull Long id) {
         ProviderService.deleteProvider(id);
         return ResponseEntity.noContent().build();
     }

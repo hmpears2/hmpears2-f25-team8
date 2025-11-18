@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,7 +47,7 @@ public class ReviewController {
      * GET /api/reviews/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Review> getReview(@PathVariable Long id) {
+    public ResponseEntity<Review> getReview(@PathVariable @NonNull Long id) {
         return ResponseEntity.ok(reviewService.getReviewById(id));
     }
     
@@ -55,7 +56,7 @@ public class ReviewController {
      * PUT /api/reviews/{id}
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Review> updateReview(@PathVariable Long id, 
+    public ResponseEntity<Review> updateReview(@PathVariable @NonNull Long id, 
                                                @Valid @RequestBody Review reviewDetails) {
         return ResponseEntity.ok(reviewService.updateReview(id, reviewDetails));
     }
@@ -65,7 +66,7 @@ public class ReviewController {
      * DELETE /api/reviews/{id}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteReview(@PathVariable @NonNull Long id) {
         reviewService.deleteReview(id);
         return ResponseEntity.noContent().build();
     }
@@ -75,7 +76,7 @@ public class ReviewController {
      * GET /api/reviews/service/{serviceId}
      */
     @GetMapping("/service/{serviceId}")
-    public ResponseEntity<List<Review>> getServiceReviews(@PathVariable Long serviceId) {
+    public ResponseEntity<List<Review>> getServiceReviews(@PathVariable @NonNull Long serviceId) {
         return ResponseEntity.ok(reviewService.getReviewsByService(
                 serviceService.getServiceById(serviceId)));
     }
@@ -85,7 +86,7 @@ public class ReviewController {
      * GET /api/reviews/customer/{customerId}
      */
     @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<Review>> getCustomerReviews(@PathVariable Long customerId) {
+    public ResponseEntity<List<Review>> getCustomerReviews(@PathVariable @NonNull Long customerId) {
         return ResponseEntity.ok(reviewService.getReviewsByCustomer(
                 customerService.getCustomerById(customerId)));
     }
@@ -105,7 +106,7 @@ public class ReviewController {
      * GET /api/reviews/service/{serviceId}/average-rating
      */
     @GetMapping("/service/{serviceId}/average-rating")
-    public ResponseEntity<Map<String, Object>> getServiceAverageRating(@PathVariable Long serviceId) {
+    public ResponseEntity<Map<String, Object>> getServiceAverageRating(@PathVariable @NonNull Long serviceId) {
         Service service = serviceService.getServiceById(serviceId);
         Double averageRating = reviewService.getAverageRating(service);
         Long reviewCount = reviewService.getReviewCount(service);
@@ -134,7 +135,7 @@ public class ReviewController {
      * GET /api/reviews/service/{serviceId}/rating-distribution
      */
     @GetMapping("/service/{serviceId}/rating-distribution")
-    public ResponseEntity<Map<Integer, Long>> getServiceRatingDistribution(@PathVariable Long serviceId) {
+    public ResponseEntity<Map<Integer, Long>> getServiceRatingDistribution(@PathVariable @NonNull Long serviceId) {
         Service service = serviceService.getServiceById(serviceId);
         Map<Integer, Long> distribution = reviewService.getRatingDistribution(service);
         return ResponseEntity.ok(distribution);

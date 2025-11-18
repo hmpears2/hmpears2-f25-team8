@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class SubscriptionController {
      * Get subscription by ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Subscription> getSubscriptionById(@PathVariable Long id) {
+    public ResponseEntity<Subscription> getSubscriptionById(@PathVariable @NonNull Long id) {
         return ResponseEntity.ok(subscriptionService.getSubscriptionById(id));
     }
     
@@ -76,7 +77,7 @@ public class SubscriptionController {
      * Delete a subscription (unsubscribe)
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSubscription(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteSubscription(@PathVariable @NonNull Long id) {
         subscriptionService.deleteSubscription(id);
         return ResponseEntity.noContent().build();
     }
@@ -107,7 +108,7 @@ public class SubscriptionController {
      * Get subscription count for a customer
      */
     @GetMapping("/customer/{customerId}/count")
-    public ResponseEntity<Long> getCustomerSubscriptionCount(@PathVariable Long customerId) {
+    public ResponseEntity<Long> getCustomerSubscriptionCount(@PathVariable @NonNull Long customerId) {
         long count = subscriptionService.countSubscriptionsForCustomer(
                 customerService.getCustomerById(customerId));
         return ResponseEntity.ok(count);
@@ -117,7 +118,7 @@ public class SubscriptionController {
      * Get subscription count for a service
      */
     @GetMapping("/service/{serviceId}/count")
-    public ResponseEntity<Long> getServiceSubscriptionCount(@PathVariable Long serviceId) {
+    public ResponseEntity<Long> getServiceSubscriptionCount(@PathVariable @NonNull Long serviceId) {
         long count = subscriptionService.countSubscriptionsForService(
                 serviceService.getServiceById(serviceId));
         return ResponseEntity.ok(count);

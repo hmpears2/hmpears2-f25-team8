@@ -2,6 +2,7 @@ package com.HomeConnectPro_hub.provider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,12 +14,12 @@ public class ProviderImplementation implements ProviderService {
     private ProviderRepository ProviderRepository;
     
     @Override
-    public Provider saveProvider(Provider provider) {
+    public Provider saveProvider(@NonNull Provider provider) {
         return ProviderRepository.save(provider);
     }
     
     @Override
-    public Optional<Provider> getProviderById(Long id) {
+    public Optional<Provider> getProviderById(@NonNull Long id) {
         return ProviderRepository.findById(id);
     }
     
@@ -33,7 +34,7 @@ public class ProviderImplementation implements ProviderService {
     }
     
     @Override
-    public void deleteProvider(Long id) {
+    public void deleteProvider(@NonNull Long id) {
         ProviderRepository.deleteById(id);
     }
 
