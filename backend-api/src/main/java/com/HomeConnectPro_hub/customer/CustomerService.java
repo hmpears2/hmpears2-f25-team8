@@ -2,6 +2,7 @@ package com.HomeConnectPro_hub.customer;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -42,9 +43,9 @@ public class CustomerService {
     /**
      * Get customer by ID
      */
-    public Customer getCustomerById(Long id) {
+    public Customer getCustomerById(@NonNull Long id) {
         return customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
+            .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
     }
     
     /**
@@ -59,7 +60,7 @@ public class CustomerService {
      * Update customer profile (Use Case 2.2.2.3)
      * Allows updating: first name, last name, email, phone number, address, and password
      */
-    public Customer updateCustomer(Long id, Customer customerDetails) {
+    public Customer updateCustomer(@NonNull Long id, @NonNull Customer customerDetails) {
         Customer customer = getCustomerById(id);
         
         // Update basic information
@@ -117,7 +118,8 @@ public class CustomerService {
      * Delete customer
      * This will cascade delete all associated subscriptions and reviews
      */
-    public void deleteCustomer(Long id) {
+    @SuppressWarnings("null")
+    public void deleteCustomer(@NonNull Long id) {
         Customer customer = getCustomerById(id);
         customerRepository.delete(customer);
     }
@@ -125,9 +127,9 @@ public class CustomerService {
     /**
      * Verify customer exists (utility method)
      */
-    public boolean customerExists(Long id) {
+    public boolean customerExists(@NonNull Long id) {
         return customerRepository.existsById(id);
-    }
+}
     
     /**
      * Verify customer credentials (for login validation)

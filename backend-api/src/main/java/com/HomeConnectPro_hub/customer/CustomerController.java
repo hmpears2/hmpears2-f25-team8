@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,8 +49,7 @@ public class CustomerController {
      * PUT /api/customers/{id}
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, 
-                                                   @Valid @RequestBody Customer customerDetails) {
+    public ResponseEntity<Customer> updateCustomer(@PathVariable @NonNull Long id, @Valid @RequestBody @NonNull Customer customerDetails) {
         return ResponseEntity.ok(customerService.updateCustomer(id, customerDetails));
     }
     
@@ -58,7 +58,7 @@ public class CustomerController {
      * GET /api/customers/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomer(@PathVariable Long id) {
+    public ResponseEntity<Customer> getCustomer(@PathVariable @NonNull Long id) {
         return ResponseEntity.ok(customerService.getCustomerById(id));
     }
     
@@ -121,7 +121,7 @@ public class CustomerController {
      * DELETE /api/customers/{id}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCustomer(@PathVariable @NonNull Long id) {
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
     }

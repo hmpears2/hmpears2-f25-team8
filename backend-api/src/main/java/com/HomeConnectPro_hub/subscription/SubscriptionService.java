@@ -7,6 +7,7 @@ import com.HomeConnectPro_hub.service.ServiceService;
 import com.HomeConnectPro_hub.provider.Provider;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -27,18 +28,20 @@ public class SubscriptionService {
     public Subscription createSubscription(Subscription subscription) {
         // Verify customer exists
         Customer customer = subscription.getCustomer();
-        if (customer == null || customer.getId() == null) {
+        Long customerId = customer.getId();
+        if (customer == null || customerId == null) {
             throw new IllegalArgumentException("Customer is required");
         }
-        customerService.getCustomerById(customer.getId());
-        
+        customerService.getCustomerById(customerId);
+
         // Verify service exists
         Service service = subscription.getService();
-        if (service == null || service.getId() == null) {
+        Long serviceId = service.getId();
+        if (service == null || serviceId == null) {
             throw new IllegalArgumentException("Service is required");
         }
-        serviceService.getServiceById(service.getId());
-        
+        serviceService.getServiceById(serviceId);
+
         // Check if subscription already exists
         if (subscriptionRepository.existsByCustomerAndService(customer, service)) {
             throw new RuntimeException("Customer is already subscribed to this service");
@@ -57,7 +60,7 @@ public class SubscriptionService {
     /**
      * Get subscription by ID
      */
-    public Subscription getSubscriptionById(Long id) {
+    public Subscription getSubscriptionById(@NonNull Long id) {
         return subscriptionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Subscription not found with id: " + id));
     }
@@ -108,7 +111,8 @@ public class SubscriptionService {
     /**
      * Delete subscription (unsubscribe)
      */
-    public void deleteSubscription(Long id) {
+    @SuppressWarnings("null")
+    public void deleteSubscription(@NonNull Long id) {
         Subscription subscription = getSubscriptionById(id);
         subscriptionRepository.delete(subscription);
     }
@@ -116,6 +120,7 @@ public class SubscriptionService {
     /**
      * Delete subscription by customer and service IDs
      */
+    @SuppressWarnings("null")
     public void deleteSubscriptionByCustomerAndService(Long customerId, Long serviceId) {
         Subscription subscription = subscriptionRepository.findByCustomerIdAndServiceId(customerId, serviceId)
                 .orElseThrow(() -> new EntityNotFoundException(
