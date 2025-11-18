@@ -32,11 +32,15 @@ public class CustomerController {
      */
     @PostMapping("/login")
     public ResponseEntity<Customer> login(@RequestBody LoginRequest loginRequest) {
-        Customer customer = customerService.getCustomerByEmail(loginRequest.getEmail());
-        if (customer != null && customer.getPassword().equals(loginRequest.getPassword())) {
-            return ResponseEntity.ok(customer);
+        try {
+            Customer customer = customerService.getCustomerByEmail(loginRequest.getEmail());
+            if (customer != null && customer.getPassword().equals(loginRequest.getPassword())) {
+                return ResponseEntity.ok(customer);
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
     
     /**
@@ -122,14 +126,37 @@ public class CustomerController {
         return ResponseEntity.noContent().build();
     }
     
-    // Inner class for login request
+    /**
+     * Inner class for login request
+     */
     public static class LoginRequest {
         private String email;
         private String password;
         
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
+        // Default constructor
+        public LoginRequest() {}
+        
+        // Constructor with parameters
+        public LoginRequest(String email, String password) {
+            this.email = email;
+            this.password = password;
+        }
+        
+        // Getters and setters
+        public String getEmail() {
+            return email;
+        }
+        
+        public void setEmail(String email) {
+            this.email = email;
+        }
+        
+        public String getPassword() {
+            return password;
+        }
+        
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
 }
