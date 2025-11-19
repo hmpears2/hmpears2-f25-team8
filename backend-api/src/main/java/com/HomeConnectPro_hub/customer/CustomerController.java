@@ -107,21 +107,22 @@ public class CustomerController {
     }
     
     /**
-     * Update customer profile
+     * Update customer profile - FIXED VERSION
      * PUT /api/customers/{id}
+     * Now accepts UpdateCustomerDTO for partial updates
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCustomer(
             @PathVariable @NonNull Long id, 
-            @Valid @RequestBody @NonNull Customer customerDetails) {
+            @Valid @RequestBody @NonNull UpdateCustomerDTO updateDTO) {
         try {
-            Customer updatedCustomer = customerService.updateCustomer(id, customerDetails);
+            Customer updatedCustomer = customerService.updateCustomerProfile(id, updateDTO);
             return ResponseEntity.ok(updatedCustomer);
             
         } catch (RuntimeException e) {
             Map<String, String> error = new HashMap<>();
-            error.put("message", "Customer not found with id: " + id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
             
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
