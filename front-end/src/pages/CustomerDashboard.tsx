@@ -41,7 +41,7 @@ const CustomerDashboard: React.FC = () => {
 
       const customerId = customerApi.getStoredCustomerId();
       if (!customerId) {
-        navigate('/login');
+        navigate('/');
         return;
       }
 

@@ -73,8 +73,11 @@ const CustomerSignup: React.FC = () => {
 
       // Save to localStorage for "login"
       localStorage.setItem('customer', JSON.stringify(newCustomer));
+      localStorage.setItem('customerId', newCustomer.id.toString());  // ← Make sure this line exists!
+      localStorage.setItem('customerEmail', newCustomer.email);
 
       // Redirect to dashboard
+      console.log('Redirecting to customer dashboard...');
       navigate('/customer-dashboard');
     } catch (err: any) {
       console.error('Registration error:', err);
