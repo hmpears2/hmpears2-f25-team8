@@ -57,7 +57,58 @@ public class CustomerService {
     }
     
     /**
-     * Update customer profile (Use Case 2.2.2.3)
+     * Update customer profile using DTO (Use Case 2.2.2.3) - FIXED VERSION
+     * Allows partial updates - only updates fields that are provided (not null)
+     */
+    @SuppressWarnings("null")
+    public Customer updateCustomerProfile(@NonNull Long id, @NonNull UpdateCustomerDTO updateDTO) {
+        Customer customer = getCustomerById(id);
+        
+        // Update only provided fields
+        if (updateDTO.getFirstName() != null && !updateDTO.getFirstName().trim().isEmpty()) {
+            customer.setFirstName(updateDTO.getFirstName().trim());
+        }
+        
+        if (updateDTO.getLastName() != null && !updateDTO.getLastName().trim().isEmpty()) {
+            customer.setLastName(updateDTO.getLastName().trim());
+        }
+        
+        if (updateDTO.getPhoneNumber() != null && !updateDTO.getPhoneNumber().trim().isEmpty()) {
+            // Validate phone number format if you want
+            String phoneNumber = updateDTO.getPhoneNumber().replaceAll("\\D", "");
+            if (phoneNumber.length() != 10) {
+                throw new RuntimeException("Phone number must be 10 digits");
+            }
+            customer.setPhoneNumber(phoneNumber);
+        }
+        
+        if (updateDTO.getAddress() != null && !updateDTO.getAddress().trim().isEmpty()) {
+            customer.setAddress(updateDTO.getAddress().trim());
+        }
+        
+        // Only update email if it's different and not already taken
+        if (updateDTO.getEmail() != null && !updateDTO.getEmail().trim().isEmpty()) {
+            if (!customer.getEmail().equals(updateDTO.getEmail())) {
+                if (customerRepository.existsByEmail(updateDTO.getEmail())) {
+                    throw new RuntimeException("Email already in use: " + updateDTO.getEmail());
+                }
+                customer.setEmail(updateDTO.getEmail().trim());
+            }
+        }
+        
+        // Only update password if provided (not empty)
+        if (updateDTO.getPassword() != null && !updateDTO.getPassword().isEmpty()) {
+            if (updateDTO.getPassword().length() < 6) {
+                throw new RuntimeException("Password must be at least 6 characters long");
+            }
+            customer.setPassword(updateDTO.getPassword());
+        }
+        
+        return customerRepository.save(customer);
+    }
+    
+    /**
+     * Update customer profile (OLD VERSION - kept for backward compatibility if needed)
      * Allows updating: first name, last name, email, phone number, address, and password
      */
     public Customer updateCustomer(@NonNull Long id, @NonNull Customer customerDetails) {
@@ -129,7 +180,7 @@ public class CustomerService {
      */
     public boolean customerExists(@NonNull Long id) {
         return customerRepository.existsById(id);
-}
+    }
     
     /**
      * Verify customer credentials (for login validation)
