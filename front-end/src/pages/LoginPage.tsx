@@ -121,7 +121,8 @@ const LoginPage: React.FC = () => {
                         placeholder="EMAIL" 
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        required 
+                        required
+                        autoComplete = "off" 
                       />
                       <span className="input-group-text">
                         <i className="bi bi-person"></i>
@@ -137,7 +138,8 @@ const LoginPage: React.FC = () => {
                         placeholder="PASSWORD" 
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required 
+                        required
+                        autoComplete = "off" 
                       />
                       <span className="input-group-text">
                         <i className="bi bi-lock"></i>
