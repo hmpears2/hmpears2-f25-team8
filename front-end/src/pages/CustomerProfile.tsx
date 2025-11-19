@@ -12,6 +12,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
   const [formData, setFormData] = useState<UpdateCustomerRequest>({
     firstName: customer.firstName,
     lastName: customer.lastName,
+    email: customer.email,
     phoneNumber: customer.phoneNumber,
     address: customer.address,
     password: ''
@@ -196,11 +197,15 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
                     <input
                       type="email"
                       className="form-control"
-                      value={customer.email}
-                      disabled
-                      title="Email cannot be changed"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      disabled={!editMode}
+                      required
                     />
-                    <small className="text-muted">Email address cannot be changed</small>
+                    <small className="text-muted">
+                      {editMode ? 'Change your email address if needed' : 'Your email address'}
+                    </small>
                   </div>
 
                   <div className="col-md-6 mb-3">
