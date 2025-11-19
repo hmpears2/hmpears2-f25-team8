@@ -75,7 +75,7 @@ const CustomerSignup: React.FC = () => {
       localStorage.setItem('customer', JSON.stringify(newCustomer));
 
       // Redirect to dashboard
-      navigate('/');
+      navigate('/customer-dashboard');
     } catch (err: any) {
       console.error('Registration error:', err);
       setError(err.message || 'Registration failed. Please try again.');
