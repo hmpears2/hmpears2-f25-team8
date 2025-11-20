@@ -23,12 +23,12 @@ const LoginPage: React.FC = () => {
     
     try {
       if (userType === 'customer') {
-        // ✅ FIXED: Actually call the API to verify customer login
+        // calls the API to verify customer login
         console.log('Attempting customer login...', { email });
         const customerData = await api.loginCustomer(email, password);
         console.log('Customer login successful:', customerData);
         
-        // Save customer data to localStorage
+        // Saves customer data to localStorage
         localStorage.setItem('customerId', customerData.id?.toString() || '');
         localStorage.setItem('customer', JSON.stringify(customerData));
         
@@ -36,12 +36,12 @@ const LoginPage: React.FC = () => {
         navigate('/customer-dashboard');
         
       } else if (userType === 'provider') {
-        // ✅ FIXED: Use the correct API method for provider login
+        // Uses API method for provider login
         console.log('Attempting provider login...', { email });
         const providerData = await api.loginProvider(email, password);
         console.log('Provider login successful:', providerData);
         
-        // Save provider data to localStorage
+        // Saves provider data to localStorage
         localStorage.setItem('providerId', providerData.id?.toString() || '');
         localStorage.setItem('provider', JSON.stringify(providerData));
         

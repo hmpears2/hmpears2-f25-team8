@@ -1,5 +1,16 @@
 package com.HomeConnectPro_hub.customer;
 
+/**
+    * ============================================================================
+    * Customer Controller - REST API endpoints for customer operations
+    * ============================================================================
+    * 
+    * This controller handles all HTTP requests related to customer management.
+    * It serves as the entry point for all customer use cases and delegates
+    * business logic to the CustomerService layer.
+**/
+
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,11 +28,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class CustomerController {
-    
+    // Service layer dependency - handles business logic
     private final CustomerService customerService;
     
     /**
-     * Create customer profile with enhanced error handling
+     * Creates customer profile with enhanced error handling
      * POST /api/customers
      */
     @PostMapping
@@ -37,7 +48,7 @@ public class CustomerController {
                     return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
                 }
             } catch (Exception e) {
-                // Customer not found, which is good - we can proceed
+                // Customer not found 
             }
             
             // Create the customer
@@ -107,9 +118,9 @@ public class CustomerController {
     }
     
     /**
-     * Update customer profile - FIXED VERSION
+     * Updates customer profile
      * PUT /api/customers/{id}
-     * Now accepts UpdateCustomerDTO for partial updates
+     * Accepts UpdateCustomerDTO for partial updates
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCustomer(

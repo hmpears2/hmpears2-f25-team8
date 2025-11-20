@@ -1,3 +1,9 @@
+/**
+*USE CASE: UC 2.2.2.1 - Customer Registration (Sign Up)
+*Provides the user interface for new customers to create an account.
+*Collects all required information and submits to backend for registration.
+**/
+
 // src/pages/CustomerSignup.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
