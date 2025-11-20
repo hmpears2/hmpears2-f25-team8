@@ -1,3 +1,6 @@
+// Allows customers to view and edit their personal information, change password,
+// and delete their account. Provides read-only account information display
+
 import React, { useState } from 'react';
 import customerApi from '../services/customerApi';
 import type { Customer, UpdateCustomerRequest } from '../types/types';
