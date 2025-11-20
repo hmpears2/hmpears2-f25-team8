@@ -84,6 +84,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
     setFormData({
       firstName: customer.firstName,
       lastName: customer.lastName,
+      email: customer.email,
       phoneNumber: customer.phoneNumber,
       address: customer.address,
       password: ''
