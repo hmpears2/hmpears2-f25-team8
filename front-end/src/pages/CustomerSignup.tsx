@@ -1,3 +1,9 @@
+/**
+*USE CASE: UC 2.2.2.1 - Customer Registration (Sign Up)
+*Provides the user interface for new customers to create an account.
+*Collects all required information and submits to backend for registration.
+**/
+
 // src/pages/CustomerSignup.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +14,7 @@ const CustomerSignup: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+// Form data matching Customer.java entity fields (excluding auto-generated fields)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -18,6 +25,7 @@ const CustomerSignup: React.FC = () => {
     address: '',
   });
 
+// Event handler for form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -27,6 +35,7 @@ const CustomerSignup: React.FC = () => {
     if (error) setError('');
   };
 
+// client-side form validation
   const validateForm = (): boolean => {
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match!');
@@ -50,7 +59,7 @@ const CustomerSignup: React.FC = () => {
 
     return true;
   };
-
+// Api integration for form submission - handles customer registration
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -71,7 +80,10 @@ const CustomerSignup: React.FC = () => {
       // Success!
       alert('Registration successful! Welcome to HomeConnect Pro!');
 
-      // Save to localStorage for "login"
+      // These values are used by:
+        // - CustomerDashboard to load customer data
+        // - customerApi.getStoredCustomerId() to identify current user
+        // Save to localStorage for "login"
       localStorage.setItem('customer', JSON.stringify(newCustomer));
       localStorage.setItem('customerId', newCustomer.id.toString());  // ← Make sure this line exists!
       localStorage.setItem('customerEmail', newCustomer.email);

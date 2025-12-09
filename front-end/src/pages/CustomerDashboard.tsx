@@ -1,3 +1,6 @@
+// Central hub for all customer operations. Provides tabbed interface to access
+// all customer features including services, subscriptions, reviews, and profile.
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import customerApi from '../services/customerApi';
@@ -7,6 +10,8 @@ import CustomerSubscriptions from './CustomerSubscriptions';
 import CustomerProfile from './CustomerProfile';
 import CustomerReviews from './CustomerReviews';
 
+
+// Defines structure for navigation tabs in dashboard
 interface DashboardTab {
   id: string;
   label: string;
@@ -22,6 +27,7 @@ const CustomerDashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
+  // Defines all available sections in the dashboard
   const tabs: DashboardTab[] = [
     { id: 'dashboard', label: 'Dashboard', icon: 'bi-speedometer2' },
     { id: 'services', label: 'Browse Services', icon: 'bi-grid-3x3-gap' },
@@ -53,13 +59,14 @@ const CustomerDashboard: React.FC = () => {
       setCustomer(customerData);
       setStatistics(stats);
     } catch (err) {
+      // Handle errors (network issues, backend errors, etc.)
       setError(err instanceof Error ? err.message : 'Failed to load customer data');
       console.error('Error loading customer data:', err);
     } finally {
       setLoading(false);
     }
   };
-
+// Event handlers
   const handleLogout = () => {
     customerApi.logout();
     navigate('/');

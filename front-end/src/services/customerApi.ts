@@ -1,3 +1,6 @@
+// Central API service for all customer-related operations. Provides typed
+// functions for interacting with the Spring Boot backend REST API.
+
 import type{
   Customer,
   Service,

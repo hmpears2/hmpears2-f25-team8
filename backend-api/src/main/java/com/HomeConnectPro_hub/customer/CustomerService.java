@@ -24,12 +24,12 @@ public class CustomerService {
             throw new RuntimeException("Customer already exists with email: " + customer.getEmail());
         }
         
-        // Check if phone number already exists (optional validation)
+        // Check if phone number already exists (optional validation for now)
         if (customer.getPhoneNumber() != null && 
             customerRepository.existsByPhoneNumber(customer.getPhoneNumber())) {
             throw new RuntimeException("Phone number already in use: " + customer.getPhoneNumber());
         }
-        
+        // Saves customer to database
         return customerRepository.save(customer);
     }
     
@@ -57,7 +57,7 @@ public class CustomerService {
     }
     
     /**
-     * Update customer profile using DTO (Use Case 2.2.2.3) - FIXED VERSION
+     * Updates customer profile using DTO (Use Case 2.2.2.3) 
      * Allows partial updates - only updates fields that are provided (not null)
      */
     @SuppressWarnings("null")
@@ -74,7 +74,7 @@ public class CustomerService {
         }
         
         if (updateDTO.getPhoneNumber() != null && !updateDTO.getPhoneNumber().trim().isEmpty()) {
-            // Validate phone number format if you want
+            // Validate phone number format (assuming US 10-digit format for this example)
             String phoneNumber = updateDTO.getPhoneNumber().replaceAll("\\D", "");
             if (phoneNumber.length() != 10) {
                 throw new RuntimeException("Phone number must be 10 digits");
@@ -108,7 +108,7 @@ public class CustomerService {
     }
     
     /**
-     * Update customer profile (OLD VERSION - kept for backward compatibility if needed)
+     * Update customer profile
      * Allows updating: first name, last name, email, phone number, address, and password
      */
     public Customer updateCustomer(@NonNull Long id, @NonNull Customer customerDetails) {

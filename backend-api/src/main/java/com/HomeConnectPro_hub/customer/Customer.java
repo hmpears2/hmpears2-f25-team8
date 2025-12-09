@@ -1,4 +1,14 @@
 package com.HomeConnectPro_hub.customer;
+/**
+ * ============================================================================
+ * Customer Entity - Represents a customer in the HomeConnectPro system
+ * ============================================================================
+ * 
+ * This entity is the core of all customer-related operations in the system.
+ * It stores customer profile information and maintains relationships with
+ * their subscriptions and reviews.
+ **/
+
 
 import com.HomeConnectPro_hub.subscription.Subscription;
 import com.HomeConnectPro_hub.review.Review;
@@ -19,10 +29,12 @@ import java.util.List;
 @Table(name = "customer")
 public class Customer {
     
+    // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    // Customer details - what is required for profile
     @NotBlank(message = "First name is required")
     @Column(name = "first_name", nullable = false)
     private String firstName;
