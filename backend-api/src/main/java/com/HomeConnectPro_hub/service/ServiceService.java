@@ -2,6 +2,8 @@ package com.HomeConnectPro_hub.service;
 
 import com.HomeConnectPro_hub.provider.Provider;
 import com.HomeConnectPro_hub.provider.ProviderService;
+import com.HomeConnectPro_hub.subscription.SubscriptionRepository;
+import com.HomeConnectPro_hub.review.ReviewRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ public class ServiceService {
     
     private final ServiceRepository serviceRepository;
     private final ProviderService providerService;
+    private final SubscriptionRepository subscriptionRepository;
+    private final ReviewRepository reviewRepository;
     
     /**
      * Create a new service
@@ -103,10 +107,19 @@ public class ServiceService {
     
     /**
      * Delete a service
+     * First deletes all related subscriptions and reviews to avoid foreign key constraint violations
      */
     @SuppressWarnings("null")
     public void deleteService(@NonNull Long id) {
         com.HomeConnectPro_hub.service.Service service = getServiceById(id);
+        
+        // Delete all subscriptions for this service
+        subscriptionRepository.deleteAll(subscriptionRepository.findByServiceId(id));
+        
+        // Delete all reviews for this service
+        reviewRepository.deleteAll(reviewRepository.findByServiceId(id));
+        
+        // Now delete the service
         serviceRepository.delete(service);
     }
     

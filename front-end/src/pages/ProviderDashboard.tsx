@@ -35,6 +35,7 @@ const ProviderDashboard: React.FC = () => {
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [replyingToReview, setReplyingToReview] = useState<number | null>(null);
   const [replyText, setReplyText] = useState<string>('');
+  const [deletingServiceId, setDeletingServiceId] = useState<number | null>(null);
 
   useEffect(() => {
     const loadProviderData = () => {
@@ -147,6 +148,10 @@ const ProviderDashboard: React.FC = () => {
   const handleDeleteService = async (serviceId: number) => {
     if (!confirm('Are you sure you want to delete this service?')) return;
     
+    // Prevent multiple clicks
+    if (deletingServiceId) return;
+    
+    setDeletingServiceId(serviceId);
     try {
       await api.deleteService(serviceId);
       alert('Service deleted successfully!');
@@ -154,6 +159,8 @@ const ProviderDashboard: React.FC = () => {
     } catch (error) {
       console.error('Error deleting service:', error);
       alert('Failed to delete service. Please try again.');
+    } finally {
+      setDeletingServiceId(null);
     }
   };
 
@@ -578,8 +585,16 @@ const ProviderDashboard: React.FC = () => {
                       <button
                         className="btn btn-sm btn-danger"
                         onClick={() => handleDeleteService(service.id!)}
+                        disabled={deletingServiceId === service.id}
                       >
-                        <i className="bi bi-trash"></i>
+                        {deletingServiceId === service.id ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                            Deleting...
+                          </>
+                        ) : (
+                          <i className="bi bi-trash"></i>
+                        )}
                       </button>
                     </div>
                   </div>

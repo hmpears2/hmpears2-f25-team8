@@ -287,6 +287,24 @@ const CustomerReviews: React.FC<CustomerReviewsProps> = ({ customerId, onUpdate 
 
                   <p className="card-text">{review.comment}</p>
 
+                  {/* Provider Response */}
+                  {review.providerResponse && (
+                    <div className="alert alert-success mt-3 mb-0" role="alert">
+                      <div className="d-flex justify-content-between align-items-start mb-2">
+                        <h6 className="alert-heading mb-0">
+                          <i className="bi bi-reply-fill me-2"></i>
+                          Provider Response
+                        </h6>
+                        {review.responseDate && (
+                          <small className="text-muted">
+                            {formatDate(review.responseDate)}
+                          </small>
+                        )}
+                      </div>
+                      <p className="mb-0 small">{review.providerResponse}</p>
+                    </div>
+                  )}
+
                   <div className="d-flex justify-content-between align-items-center mt-3">
                     <small className="text-muted">
                       <i className="bi bi-calendar me-1"></i>

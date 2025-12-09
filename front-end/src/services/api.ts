@@ -228,7 +228,8 @@ export const api = {
       throw new Error(`Failed to delete service: ${response.status}`);
     }
     
-    return response.json();
+    // DELETE returns 204 No Content, so don't try to parse JSON
+    return;
   },
 
   async activateService(serviceId: number) {
