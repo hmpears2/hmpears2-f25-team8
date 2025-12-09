@@ -34,6 +34,9 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(serviceData),
     });
+    if (!response.ok) {
+      throw new Error('Failed to create service');
+    }
     return response.json();
   },
 
@@ -188,6 +191,26 @@ export const api = {
       throw new Error(`Failed to delete service: ${response.status}`);
     }
     
+    return response.json();
+  },
+
+  async activateService(serviceId: number) {
+    const response = await fetch(`${API_BASE_URL}/api/services/${serviceId}/activate`, {
+      method: 'PUT',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to activate service');
+    }
+    return response.json();
+  },
+
+  async deactivateService(serviceId: number) {
+    const response = await fetch(`${API_BASE_URL}/api/services/${serviceId}/deactivate`, {
+      method: 'PUT',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to deactivate service');
+    }
     return response.json();
   },
 
