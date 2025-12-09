@@ -39,7 +39,8 @@ const ProviderDashboard: React.FC = () => {
 
   useEffect(() => {
     const loadProviderData = () => {
-      const storedData = localStorage.getItem('providerData');
+      // Check for 'provider' key first (set by login), then 'providerData' (set by signup)
+      const storedData = localStorage.getItem('provider') || localStorage.getItem('providerData');
       const storedId = localStorage.getItem('providerId');
       
       if (storedData) {
@@ -56,7 +57,7 @@ const ProviderDashboard: React.FC = () => {
       try {
         const data = await providerService.getProvider(id);
         setProviderData(data);
-        localStorage.setItem('providerData', JSON.stringify(data));
+        localStorage.setItem('provider', JSON.stringify(data));
       } catch (error) {
         console.error('Error fetching provider data:', error);
         navigate('/');

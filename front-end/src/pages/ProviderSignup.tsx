@@ -80,7 +80,7 @@ const ProviderSignup: React.FC = () => {
 
       const result = await providerService.register(providerData);
       localStorage.setItem('providerId', result.id?.toString() || '');
-      localStorage.setItem('providerData', JSON.stringify(result));
+      localStorage.setItem('provider', JSON.stringify(result));
       navigate('/provider-dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
