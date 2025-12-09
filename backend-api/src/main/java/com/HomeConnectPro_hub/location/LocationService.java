@@ -3,9 +3,11 @@ package com.HomeConnectPro_hub.location;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * ============================================================================
@@ -47,34 +49,46 @@ public class LocationService {
      * @return GeoLocation with lat/lng or null if not found
      */
     public GeoLocation geocodeAddress(String address) {
+        if (address == null || address.trim().isEmpty()) {
+            return null;
+        }
+        
         try {
             // If no API key is configured, use fallback coordinates for demo
             if (googleApiKey == null || googleApiKey.isEmpty()) {
                 return getFallbackCoordinates(address);
             }
 
-            String url = UriComponentsBuilder.fromHttpUrl(GEOCODING_API_URL)
-                    .queryParam("address", address)
-                    .queryParam("key", googleApiKey)
-                    .build()
-                    .toUriString();
-
-            String response = restTemplate.getForObject(url, String.class);
+            // Build URL string
+            String encodedAddress = URLEncoder.encode(address, StandardCharsets.UTF_8);
+            String urlString = GEOCODING_API_URL + "?address=" + encodedAddress + "&key=" + googleApiKey;
+            
+            // Use the String overload of getForObject to avoid URI null issues
+            String response = restTemplate.getForObject(urlString, String.class);
+            
+            if (response == null) {
+                return getFallbackCoordinates(address);
+            }
+            
             JsonNode root = objectMapper.readTree(response);
 
             String status = root.path("status").asText();
             if ("OK".equals(status)) {
-                JsonNode location = root.path("results").get(0).path("geometry").path("location");
-                double lat = location.path("lat").asDouble();
-                double lng = location.path("lng").asDouble();
-                
-                String formattedAddress = root.path("results").get(0).path("formatted_address").asText();
-                
-                return new GeoLocation(lat, lng, formattedAddress);
-            } else {
-                System.err.println("Geocoding API returned status: " + status);
-                return getFallbackCoordinates(address);
+                JsonNode results = root.path("results");
+                if (results.isArray() && results.size() > 0) {
+                    JsonNode location = results.get(0).path("geometry").path("location");
+                    double lat = location.path("lat").asDouble();
+                    double lng = location.path("lng").asDouble();
+                    
+                    String formattedAddress = results.get(0).path("formatted_address").asText();
+                    
+                    return new GeoLocation(lat, lng, formattedAddress);
+                }
             }
+            
+            System.err.println("Geocoding API returned status: " + status);
+            return getFallbackCoordinates(address);
+            
         } catch (Exception e) {
             System.err.println("Error geocoding address: " + e.getMessage());
             return getFallbackCoordinates(address);
@@ -119,6 +133,11 @@ public class LocationService {
      * @return Distance in miles
      */
     public double calculateDistanceBetweenAddresses(String address1, String address2) {
+        if (address1 == null || address2 == null || 
+            address1.trim().isEmpty() || address2.trim().isEmpty()) {
+            return Double.MAX_VALUE;
+        }
+        
         GeoLocation loc1 = geocodeAddress(address1);
         GeoLocation loc2 = geocodeAddress(address2);
         return calculateDistance(loc1, loc2);
@@ -142,6 +161,10 @@ public class LocationService {
      * Uses approximate coordinates for common NC cities
      */
     private GeoLocation getFallbackCoordinates(String address) {
+        if (address == null) {
+            return new GeoLocation(36.0726, -79.7920, "Unknown Location");
+        }
+        
         String lowerAddress = address.toLowerCase();
         
         // Greensboro, NC area coordinates
@@ -172,10 +195,24 @@ public class LocationService {
         else if (lowerAddress.contains("charlotte")) {
             return new GeoLocation(35.2271, -80.8431, address);
         }
-        // Default to Greensboro center with slight random offset for variety
+        // Asheboro, NC
+        else if (lowerAddress.contains("asheboro")) {
+            return new GeoLocation(35.7079, -79.8136, address);
+        }
+        // Lexington, NC
+        else if (lowerAddress.contains("lexington")) {
+            return new GeoLocation(35.8240, -80.2534, address);
+        }
+        // Thomasville, NC
+        else if (lowerAddress.contains("thomasville")) {
+            return new GeoLocation(35.8826, -80.0820, address);
+        }
+        // Default to Greensboro center with slight deterministic offset for variety
         else {
-            double latOffset = (Math.random() - 0.5) * 0.1;
-            double lngOffset = (Math.random() - 0.5) * 0.1;
+            // Create deterministic offset based on address hash for consistency
+            int hash = address.hashCode();
+            double latOffset = ((hash % 100) / 1000.0) - 0.05;
+            double lngOffset = (((hash / 100) % 100) / 1000.0) - 0.05;
             return new GeoLocation(36.0726 + latOffset, -79.7920 + lngOffset, address);
         }
     }
@@ -191,7 +228,7 @@ public class LocationService {
         public GeoLocation(double latitude, double longitude, String formattedAddress) {
             this.latitude = latitude;
             this.longitude = longitude;
-            this.formattedAddress = formattedAddress;
+            this.formattedAddress = formattedAddress != null ? formattedAddress : "Unknown";
         }
 
         public double getLatitude() {

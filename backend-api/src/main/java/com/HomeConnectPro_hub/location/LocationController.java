@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
  * 1. Getting services filtered by distance from customer
  * 2. Calculating distance between addresses
  * 3. Geocoding addresses to coordinates
+ * 
+ * 3rd Party API: Google Maps Geocoding API
  */
 @RestController
 @RequestMapping("/api/location")
@@ -42,15 +44,25 @@ public class LocationController {
             @RequestParam(defaultValue = "25") double maxDistance) {
         
         try {
+            if (customerId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            
             // Get customer's address
             Customer customer = customerService.getCustomerById(customerId);
             String customerAddress = customer.getAddress();
+            
+            if (customerAddress == null || customerAddress.trim().isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
             
             // Get all active services
             List<Service> services = serviceService.getActiveServices();
             
             // Calculate distance for each service and filter
             List<ServiceWithDistance> nearbyServices = services.stream()
+                    .filter(service -> service.getProvider() != null && 
+                                      service.getProvider().getAddress() != null)
                     .map(service -> {
                         String providerAddress = service.getProvider().getAddress();
                         double distance = locationService.calculateDistanceBetweenAddresses(
@@ -78,16 +90,28 @@ public class LocationController {
             @RequestParam Long customerId) {
         
         try {
+            if (customerId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            
             Customer customer = customerService.getCustomerById(customerId);
             String customerAddress = customer.getAddress();
+            
+            if (customerAddress == null || customerAddress.trim().isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
             
             List<Service> services = serviceService.getActiveServices();
             
             List<ServiceWithDistance> servicesWithDistance = services.stream()
                     .map(service -> {
-                        String providerAddress = service.getProvider().getAddress();
-                        double distance = locationService.calculateDistanceBetweenAddresses(
-                                customerAddress, providerAddress);
+                        String providerAddress = (service.getProvider() != null) 
+                                ? service.getProvider().getAddress() 
+                                : null;
+                        double distance = (providerAddress != null)
+                                ? locationService.calculateDistanceBetweenAddresses(
+                                        customerAddress, providerAddress)
+                                : Double.MAX_VALUE;
                         return new ServiceWithDistance(service, distance);
                     })
                     .sorted(Comparator.comparingDouble(ServiceWithDistance::getDistance))
@@ -111,6 +135,12 @@ public class LocationController {
             @RequestParam String to) {
         
         try {
+            if (from == null || to == null || from.trim().isEmpty() || to.trim().isEmpty()) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("error", "Both 'from' and 'to' addresses are required");
+                return ResponseEntity.badRequest().body(error);
+            }
+            
             double distance = locationService.calculateDistanceBetweenAddresses(from, to);
             
             Map<String, Object> response = new HashMap<>();
@@ -137,6 +167,12 @@ public class LocationController {
     @GetMapping("/geocode")
     public ResponseEntity<Map<String, Object>> geocodeAddress(@RequestParam String address) {
         try {
+            if (address == null || address.trim().isEmpty()) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("error", "Address is required");
+                return ResponseEntity.badRequest().body(error);
+            }
+            
             LocationService.GeoLocation location = locationService.geocodeAddress(address);
             
             if (location != null) {
@@ -168,8 +204,18 @@ public class LocationController {
     @GetMapping("/services/distance-summary")
     public ResponseEntity<Map<String, Object>> getDistanceSummary(@RequestParam Long customerId) {
         try {
+            if (customerId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            
             Customer customer = customerService.getCustomerById(customerId);
             String customerAddress = customer.getAddress();
+            
+            if (customerAddress == null || customerAddress.trim().isEmpty()) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("error", "Customer address not found");
+                return ResponseEntity.badRequest().body(error);
+            }
             
             List<Service> services = serviceService.getActiveServices();
             
@@ -179,6 +225,11 @@ public class LocationController {
             int beyond25Miles = 0;
             
             for (Service service : services) {
+                if (service.getProvider() == null || service.getProvider().getAddress() == null) {
+                    beyond25Miles++;
+                    continue;
+                }
+                
                 String providerAddress = service.getProvider().getAddress();
                 double distance = locationService.calculateDistanceBetweenAddresses(
                         customerAddress, providerAddress);
@@ -213,7 +264,10 @@ public class LocationController {
 
         public ServiceWithDistance(Service service, double distance) {
             this.service = service;
-            this.distance = Math.round(distance * 10.0) / 10.0; // Round to 1 decimal
+            // Round to 1 decimal, handle MAX_VALUE case
+            this.distance = (distance == Double.MAX_VALUE) 
+                    ? -1 
+                    : Math.round(distance * 10.0) / 10.0;
         }
 
         public Service getService() {
@@ -225,7 +279,9 @@ public class LocationController {
         }
         
         public String getDistanceFormatted() {
-            if (distance < 1) {
+            if (distance < 0) {
+                return "Distance unavailable";
+            } else if (distance < 1) {
                 return "< 1 mile away";
             } else if (distance == 1) {
                 return "1 mile away";

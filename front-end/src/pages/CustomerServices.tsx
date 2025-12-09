@@ -7,9 +7,16 @@ interface CustomerServicesProps {
   onSubscribe: () => void;
 }
 
+interface ServiceWithDistance {
+  service: Service;
+  distance: number;
+  distanceFormatted: string;
+}
+
 const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubscribe }) => {
   const [services, setServices] = useState<Service[]>([]);
-  const [filteredServices, setFilteredServices] = useState<Service[]>([]);
+  const [servicesWithDistance, setServicesWithDistance] = useState<ServiceWithDistance[]>([]);
+  const [filteredServices, setFilteredServices] = useState<ServiceWithDistance[]>([]);
   const [subscribedServices, setSubscribedServices] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState<boolean>(true);
   const [subscribing, setSubscribing] = useState<number | null>(null);
@@ -20,7 +27,12 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 1000 });
-  const [sortBy, setSortBy] = useState<string>('name');
+  const [sortBy, setSortBy] = useState<string>('distance'); // Default to distance sorting
+  
+  // NEW: Distance filter state
+  const [maxDistance, setMaxDistance] = useState<number>(50); // Default 50 miles
+  const [useLocationFilter, setUseLocationFilter] = useState<boolean>(true);
+  const [locationLoading, setLocationLoading] = useState<boolean>(false);
 
   // Get unique categories from services
   const categories = Array.from(new Set(services.map(s => s.serviceType || 'Other').filter(Boolean)));
@@ -31,86 +43,148 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
 
   useEffect(() => {
     applyFilters();
-  }, [services, searchTerm, selectedCategory, priceRange, sortBy]);
+  }, [servicesWithDistance, searchTerm, selectedCategory, priceRange, sortBy, maxDistance, useLocationFilter]);
 
   const loadServices = async () => {
     try {
       setLoading(true);
+      setLocationLoading(true);
       setError(null);
 
-      // Load all active services
-      const servicesData = await customerApi.getActiveServices();
-      
-      // Load user's subscriptions to check which services they're already subscribed to
+      // Load user's subscriptions first
       const subscriptions = await customerApi.getMySubscriptions(customerId);
       const subscribedIds = new Set(subscriptions.map(sub => sub.service.id));
-      
-      // Load average ratings for each service
-      const servicesWithRatings = await Promise.all(
-        servicesData.map(async (service) => {
-          try {
-            const avgRating = await customerApi.getServiceAverageRating(service.id);
-            const reviews = await customerApi.getServiceReviews(service.id);
-            return { 
-              ...service, 
-              averageRating: avgRating || 0,
-              reviewCount: reviews.length 
-            };
-          } catch {
-            return { ...service, averageRating: 0, reviewCount: 0 };
-          }
-        })
-      );
-
-      setServices(servicesWithRatings);
       setSubscribedServices(subscribedIds);
+
+      // Try to load services with distance from the location API
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/location/services/with-distance?customerId=${customerId}`
+        );
+        
+        if (response.ok) {
+          const data: ServiceWithDistance[] = await response.json();
+          
+          // Enrich with ratings
+          const enrichedData = await Promise.all(
+            data.map(async (swd) => {
+              try {
+                const avgRating = await customerApi.getServiceAverageRating(swd.service.id);
+                const reviews = await customerApi.getServiceReviews(swd.service.id);
+                return {
+                  ...swd,
+                  service: {
+                    ...swd.service,
+                    averageRating: avgRating || 0,
+                    reviewCount: reviews.length
+                  }
+                };
+              } catch {
+                return {
+                  ...swd,
+                  service: { ...swd.service, averageRating: 0, reviewCount: 0 }
+                };
+              }
+            })
+          );
+          
+          setServicesWithDistance(enrichedData);
+          setServices(enrichedData.map(swd => swd.service));
+        } else {
+          // Fallback to regular service loading
+          await loadServicesWithoutDistance();
+        }
+      } catch (locationError) {
+        console.log('Location API not available, using standard service loading');
+        await loadServicesWithoutDistance();
+      }
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load services');
     } finally {
       setLoading(false);
+      setLocationLoading(false);
     }
   };
 
+  const loadServicesWithoutDistance = async () => {
+    const servicesData = await customerApi.getActiveServices();
+    
+    const servicesWithRatings = await Promise.all(
+      servicesData.map(async (service) => {
+        try {
+          const avgRating = await customerApi.getServiceAverageRating(service.id);
+          const reviews = await customerApi.getServiceReviews(service.id);
+          return { 
+            ...service, 
+            averageRating: avgRating || 0,
+            reviewCount: reviews.length 
+          };
+        } catch {
+          return { ...service, averageRating: 0, reviewCount: 0 };
+        }
+      })
+    );
+
+    setServices(servicesWithRatings);
+    // Create mock distance data (will show as N/A)
+    setServicesWithDistance(servicesWithRatings.map(s => ({
+      service: s,
+      distance: -1,
+      distanceFormatted: 'Distance unavailable'
+    })));
+    setUseLocationFilter(false);
+  };
+
   const applyFilters = () => {
-    let filtered = [...services];
+    let filtered = [...servicesWithDistance];
+
+    // Distance filter (only if location data is available)
+    if (useLocationFilter && maxDistance < 100) {
+      filtered = filtered.filter(swd => swd.distance >= 0 && swd.distance <= maxDistance);
+    }
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(service =>
-        service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.provider.companyName.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(swd =>
+        swd.service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        swd.service.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        swd.service.provider?.companyName?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Category filter
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(service => 
-        (service.serviceType || 'Other') === selectedCategory
+      filtered = filtered.filter(swd => 
+        (swd.service.serviceType || 'Other') === selectedCategory
       );
     }
 
     // Price range filter
-    filtered = filtered.filter(service => 
-      service.price >= priceRange.min && service.price <= priceRange.max
+    filtered = filtered.filter(swd => 
+      swd.service.price >= priceRange.min && swd.service.price <= priceRange.max
     );
 
     // Sorting
     switch (sortBy) {
+      case 'distance':
+        filtered.sort((a, b) => {
+          if (a.distance < 0) return 1;
+          if (b.distance < 0) return -1;
+          return a.distance - b.distance;
+        });
+        break;
       case 'name':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        filtered.sort((a, b) => a.service.name.localeCompare(b.service.name));
         break;
       case 'price-low':
-        filtered.sort((a, b) => a.price - b.price);
+        filtered.sort((a, b) => a.service.price - b.service.price);
         break;
       case 'price-high':
-        filtered.sort((a, b) => b.price - a.price);
+        filtered.sort((a, b) => b.service.price - a.service.price);
         break;
       case 'rating':
-        filtered.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
-        break;
-      case 'provider':
-        filtered.sort((a, b) => a.provider.companyName.localeCompare(b.provider.companyName));
+        filtered.sort((a, b) => (b.service.averageRating || 0) - (a.service.averageRating || 0));
         break;
     }
 
@@ -128,10 +202,7 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
       setSubscribedServices(prev => new Set(prev).add(serviceId));
       setSuccessMessage('Successfully subscribed to the service!');
       
-      // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(null), 3000);
-      
-      // Call parent refresh
       onSubscribe();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to subscribe to service');
@@ -164,11 +235,33 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
     }).format(amount);
   };
 
+  const formatDistance = (distance: number): string => {
+    if (distance < 0) return 'N/A';
+    if (distance < 1) return '< 1 mile';
+    return `${distance.toFixed(1)} mi`;
+  };
+
+  const getDistanceBadgeColor = (distance: number): string => {
+    if (distance < 0) return 'secondary';
+    if (distance <= 5) return 'success';
+    if (distance <= 15) return 'primary';
+    if (distance <= 25) return 'warning';
+    return 'danger';
+  };
+
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading services...</span>
+        <div className="text-center">
+          <div className="spinner-border text-primary mb-3" role="status">
+            <span className="visually-hidden">Loading services...</span>
+          </div>
+          {locationLoading && (
+            <p className="text-muted">
+              <i className="bi bi-geo-alt me-2"></i>
+              Calculating distances to providers...
+            </p>
+          )}
         </div>
       </div>
     );
@@ -198,12 +291,30 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
         </div>
       )}
 
+      {/* Location Filter Banner */}
+      {useLocationFilter && (
+        <div className="alert alert-info border-0 shadow-sm mb-4">
+          <div className="d-flex align-items-center">
+            <i className="bi bi-geo-alt-fill fs-4 me-3 text-primary"></i>
+            <div className="flex-grow-1">
+              <strong>Location-Based Search Active</strong>
+              <p className="mb-0 small text-muted">
+                Services are sorted by distance from your address. Powered by Google Maps API.
+              </p>
+            </div>
+            <span className="badge bg-primary rounded-pill">
+              {filteredServices.length} nearby
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Filters Section */}
       <div className="card border-0 shadow-sm mb-4">
         <div className="card-body">
           <div className="row g-3">
             {/* Search */}
-            <div className="col-md-4">
+            <div className="col-md-3">
               <label className="form-label">Search Services</label>
               <div className="input-group">
                 <span className="input-group-text">
@@ -219,8 +330,30 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
               </div>
             </div>
 
-            {/* Category Filter */}
+            {/* Distance Filter - NEW */}
             <div className="col-md-3">
+              <label className="form-label">
+                <i className="bi bi-geo-alt me-1"></i>
+                Max Distance: {maxDistance >= 100 ? 'Any' : `${maxDistance} miles`}
+              </label>
+              <input
+                type="range"
+                className="form-range"
+                min="5"
+                max="100"
+                step="5"
+                value={maxDistance}
+                onChange={(e) => setMaxDistance(parseInt(e.target.value))}
+                disabled={!useLocationFilter}
+              />
+              <div className="d-flex justify-content-between">
+                <small className="text-muted">5 mi</small>
+                <small className="text-muted">Any</small>
+              </div>
+            </div>
+
+            {/* Category Filter */}
+            <div className="col-md-2">
               <label className="form-label">Category</label>
               <select 
                 className="form-select"
@@ -237,7 +370,7 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
             </div>
 
             {/* Price Range */}
-            <div className="col-md-3">
+            <div className="col-md-2">
               <label className="form-label">Max Price: ${priceRange.max}</label>
               <input
                 type="range"
@@ -248,10 +381,6 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
                 value={priceRange.max}
                 onChange={(e) => setPriceRange({ ...priceRange, max: parseInt(e.target.value) })}
               />
-              <div className="d-flex justify-content-between">
-                <small>$0</small>
-                <small>$1000</small>
-              </div>
             </div>
 
             {/* Sort By */}
@@ -262,11 +391,11 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
+                <option value="distance">Distance (Nearest)</option>
                 <option value="name">Name</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
                 <option value="rating">Rating</option>
-                <option value="provider">Provider</option>
               </select>
             </div>
           </div>
@@ -275,13 +404,15 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
 
       {/* Results Count */}
       <p className="text-muted mb-3">
+        <i className="bi bi-funnel me-1"></i>
         Showing {filteredServices.length} of {services.length} services
+        {useLocationFilter && maxDistance < 100 && ` within ${maxDistance} miles`}
       </p>
 
       {/* Services Grid */}
       <div className="row">
         {filteredServices.length > 0 ? (
-          filteredServices.map(service => (
+          filteredServices.map(({ service, distance }) => (
             <div key={service.id} className="col-lg-4 col-md-6 mb-4">
               <div className="card h-100 shadow-sm border-0">
                 <div className="card-body">
@@ -290,12 +421,21 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
                     <div>
                       <h5 className="card-title mb-1">{service.name}</h5>
                       <p className="text-muted small mb-0">
-                        by {service.provider.companyName}
+                        by {service.provider?.companyName || 'Unknown Provider'}
                       </p>
                     </div>
-                    <span className="badge bg-primary rounded-pill">
-                      {service.serviceType || 'General'}
-                    </span>
+                    <div className="text-end">
+                      <span className="badge bg-primary rounded-pill mb-1 d-block">
+                        {service.serviceType || 'General'}
+                      </span>
+                      {/* Distance Badge - NEW */}
+                      {useLocationFilter && (
+                        <span className={`badge bg-${getDistanceBadgeColor(distance)} rounded-pill`}>
+                          <i className="bi bi-geo-alt me-1"></i>
+                          {formatDistance(distance)}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Description */}
@@ -317,11 +457,15 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
                   <div className="mb-3 p-2 bg-light rounded">
                     <small className="text-muted">Provider Details:</small>
                     <div className="small">
-                      <strong>{service.provider.firstName} {service.provider.lastName}</strong><br />
-                      <i className="bi bi-envelope me-1"></i>{service.provider.email}<br />
-                      <i className="bi bi-telephone me-1"></i>{service.provider.phoneNumber}<br />
-                      {service.provider.yearsOfExperience && (
-                        <span><i className="bi bi-award me-1"></i>{service.provider.yearsOfExperience} years experience</span>
+                      <strong>{service.provider?.firstName} {service.provider?.lastName}</strong><br />
+                      <i className="bi bi-envelope me-1"></i>{service.provider?.email}<br />
+                      <i className="bi bi-telephone me-1"></i>{service.provider?.phoneNumber || service.provider?.phoneNumber}<br />
+                      {/* Distance Detail - NEW */}
+                      {useLocationFilter && distance >= 0 && (
+                        <span className="text-primary">
+                          <i className="bi bi-geo-alt me-1"></i>
+                          {distance < 1 ? 'Less than 1 mile away' : `${distance.toFixed(1)} miles from you`}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -368,11 +512,23 @@ const CustomerServices: React.FC<CustomerServicesProps> = ({ customerId, onSubsc
           <div className="col-12">
             <div className="alert alert-info">
               <i className="bi bi-info-circle me-2"></i>
-              No services found matching your criteria. Try adjusting your filters.
+              No services found matching your criteria. 
+              {useLocationFilter && maxDistance < 50 && (
+                <span> Try increasing the distance filter or </span>
+              )}
+              Try adjusting your filters.
             </div>
           </div>
         )}
       </div>
+
+      {/* Google Maps Attribution */}
+      {useLocationFilter && (
+        <div className="text-center text-muted small mt-4">
+          <i className="bi bi-geo-alt me-1"></i>
+          Distance calculations powered by Google Maps Geocoding API
+        </div>
+      )}
     </div>
   );
 };
