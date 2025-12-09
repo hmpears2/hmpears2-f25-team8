@@ -37,7 +37,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
       setError('Passwords do not match');
       return false;
     }
-
+    
     if (formData.password && formData.password.length < 6) {
       setError('Password must be at least 6 characters long');
       return false;
@@ -65,20 +65,20 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
       if (!updateData.password) {
         delete updateData.password;
       }
-
+      
       // Strip non-digits from phone number to match backend validation (10 digits only)
       if (updateData.phoneNumber) {
         updateData.phoneNumber = updateData.phoneNumber.replace(/\D/g, '');
       }
 
       const updatedCustomer = await customerApi.updateProfile(customer.id, updateData);
-
+      
       onUpdate(updatedCustomer);
       setSuccessMessage('Profile updated successfully!');
       setEditMode(false);
       setFormData({ ...formData, password: '' });
       setConfirmPassword('');
-
+      
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update profile');
@@ -112,7 +112,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
       setError(null);
 
       await customerApi.deleteAccount(customer.id);
-
+      
       // This would normally redirect to login or home page
       window.location.href = '/';
     } catch (err) {
@@ -140,7 +140,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
           Profile Settings
         </h2>
         {!editMode && (
-          <button
+          <button 
             className="btn btn-primary"
             onClick={() => setEditMode(true)}
           >
@@ -188,7 +188,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
                       disabled={!editMode}
                     />
                   </div>
-
+                  
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Last Name</label>
                     <input
@@ -350,7 +350,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
                 Keep your account secure by using a strong password and updating it regularly.
               </p>
               <div className="d-grid">
-                <button
+                <button 
                   className="btn btn-outline-primary"
                   onClick={() => setEditMode(true)}
                 >
@@ -374,7 +374,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
                 Once you delete your account, there is no going back. Please be certain.
               </p>
               <div className="d-grid">
-                <button
+                <button 
                   className="btn btn-danger"
                   onClick={() => setShowDeleteModal(true)}
                 >
@@ -397,9 +397,9 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
                   <i className="bi bi-exclamation-triangle me-2"></i>
                   Delete Account
                 </h5>
-                <button
-                  type="button"
-                  className="btn-close btn-close-white"
+                <button 
+                  type="button" 
+                  className="btn-close btn-close-white" 
                   onClick={() => {
                     setShowDeleteModal(false);
                     setDeleteConfirmation('');
@@ -411,9 +411,9 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
                 <div className="alert alert-danger">
                   <strong>Warning!</strong> This action cannot be undone. All your data will be permanently deleted.
                 </div>
-
+                
                 <p>Please type your email address <strong>{customer.email}</strong> to confirm:</p>
-
+                
                 <input
                   type="text"
                   className="form-control"
@@ -424,9 +424,9 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
                 />
               </div>
               <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
                   onClick={() => {
                     setShowDeleteModal(false);
                     setDeleteConfirmation('');
@@ -435,8 +435,8 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
                 >
                   Cancel
                 </button>
-                <button
-                  type="button"
+                <button 
+                  type="button" 
                   className="btn btn-danger"
                   onClick={handleDeleteAccount}
                   disabled={saving || deleteConfirmation !== customer.email}
