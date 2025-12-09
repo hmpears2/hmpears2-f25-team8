@@ -232,7 +232,7 @@ export const customerApi = {
     }
     if (filters.providerName) {
       services = services.filter(s => 
-        s.provider.companyName.toLowerCase().includes(filters.providerName!.toLowerCase())
+        (s.provider.companyName || s.provider.businessName || '').toLowerCase().includes(filters.providerName!.toLowerCase())
       );
     }
     

@@ -68,6 +68,8 @@ export interface Review {
   rating: number;
   comment: string;
   createdAt: string;
+  providerResponse?: string;
+  responseDate?: string;
 }
 
 // Login request interface
