@@ -17,6 +17,7 @@ import java.util.HashMap;
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class ReviewController {
     
     private final ReviewService reviewService;
@@ -72,6 +73,22 @@ public class ReviewController {
     }
     
     /**
+     * Add provider response to a review (Use Case 2.2.1.6 - Reply to Reviews)
+     * PUT /api/reviews/{id}/response
+     */
+    @PutMapping("/{id}/response")
+    public ResponseEntity<Review> addProviderResponse(
+            @PathVariable @NonNull Long id, 
+            @RequestBody Map<String, String> requestBody) {
+        String providerResponse = requestBody.get("providerResponse");
+        if (providerResponse == null || providerResponse.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        Review updatedReview = reviewService.addProviderResponse(id, providerResponse);
+        return ResponseEntity.ok(updatedReview);
+    }
+    
+    /**
      * Get reviews for a specific service (Use Case 2.2.1.8 - View Reviews)
      * GET /api/reviews/service/{serviceId}
      */
@@ -95,11 +112,10 @@ public class ReviewController {
      * Get all reviews for a provider's services
      * GET /api/reviews/provider/{providerId}
      */
-    // @GetMapping("/provider/{providerId}")
-    // public ResponseEntity<List<Review>> getProviderReviews(@PathVariable Long providerId) {
-    //     return ResponseEntity.ok(reviewService.getReviewsByProvider(
-    //             providerService.getProviderById(providerId)));
-    // }
+    @GetMapping("/provider/{providerId}")
+    public ResponseEntity<List<Review>> getProviderReviews(@PathVariable Long providerId) {
+        return ResponseEntity.ok(reviewService.getReviewsByProviderId(providerId));
+    }
     
     /**
      * Get average rating for a service

@@ -30,7 +30,7 @@ public class Review {
     
     @ManyToOne
     @JoinColumn(name = "service_id", nullable = false)
-    @JsonIgnoreProperties({"reviews", "subscriptions", "provider"})
+    @JsonIgnoreProperties({"reviews", "subscriptions"})
     private Service service;
     
     @NotNull(message = "Rating is required")
@@ -43,7 +43,12 @@ public class Review {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String comment;
     
-    @NotNull
+    @Column(name = "provider_response", columnDefinition = "TEXT")
+    private String providerResponse;
+    
+    @Column(name = "response_date")
+    private LocalDateTime responseDate;
+    
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
     

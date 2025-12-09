@@ -21,15 +21,21 @@ export interface Provider {
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber: string;
-  companyName: string;
-  serviceCategory: string;
-  licenseNumber: string;
-  yearsOfExperience: number;
+  phone?: string; // Backend uses 'phone'
+  phoneNumber?: string; // Alternative name
+  businessName?: string; // Backend uses 'businessName'
+  companyName?: string; // Alternative name
+  address?: string;
+  serviceCategory?: string;
+  primaryService?: string;
+  licenseNumber?: string;
+  yearsExperience?: number; // Backend uses 'yearsExperience'
+  yearsOfExperience?: number; // Alternative name
   bio?: string;
   hourlyRate?: number;
   rating?: number;
   verified?: boolean;
+  active?: boolean;
   services?: Service[];
 }
 

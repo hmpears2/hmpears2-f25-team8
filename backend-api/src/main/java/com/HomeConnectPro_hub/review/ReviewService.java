@@ -101,6 +101,16 @@ public class ReviewService {
     }
     
     /**
+     * Add provider response to review (Use Case 2.2.1.6 - Reply to Reviews)
+     */
+    public Review addProviderResponse(@NonNull Long reviewId, String providerResponse) {
+        Review review = getReviewById(reviewId);
+        review.setProviderResponse(providerResponse);
+        review.setResponseDate(java.time.LocalDateTime.now());
+        return reviewRepository.save(review);
+    }
+    
+    /**
      * Get all reviews for a service (Use Case 2.2.1.8 - View Reviews)
      */
     public List<Review> getReviewsByService(Service service) {
