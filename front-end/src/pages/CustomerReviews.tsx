@@ -276,7 +276,7 @@ const CustomerReviews: React.FC<CustomerReviewsProps> = ({ customerId, onUpdate 
                     <div>
                       <h5 className="card-title mb-1">{review.service.name}</h5>
                       <p className="text-muted small mb-0">
-                        Provider: {review.service.provider.companyName}
+                        Provider: {review.service.provider?.businessName || review.service.provider?.companyName || 'Unknown Provider'}
                       </p>
                     </div>
                     <div className="text-end">
@@ -362,7 +362,7 @@ const CustomerReviews: React.FC<CustomerReviewsProps> = ({ customerId, onUpdate 
                     <option value="">Choose a service...</option>
                     {unreviewedServices.map(sub => (
                       <option key={sub.service.id} value={sub.service.id}>
-                        {sub.service.name} - {sub.service.provider.companyName}
+                        {sub.service.name} - {sub.service.provider?.businessName || sub.service.provider?.companyName || 'Unknown Provider'}
                       </option>
                     ))}
                   </select>

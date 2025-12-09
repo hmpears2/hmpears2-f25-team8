@@ -4,7 +4,6 @@ import com.HomeConnectPro_hub.customer.Customer;
 import com.HomeConnectPro_hub.service.Service;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,10 +26,9 @@ public class Subscription {
     
     @ManyToOne
     @JoinColumn(name = "service_id", nullable = false)
-    @JsonIgnoreProperties({"subscriptions", "reviews", "provider"})
+    @JsonIgnoreProperties({"subscriptions", "reviews"})
     private Service service;
     
-    @NotNull
     @Column(name = "subscribed_at", nullable = false)
     private LocalDateTime subscribedAt;
     

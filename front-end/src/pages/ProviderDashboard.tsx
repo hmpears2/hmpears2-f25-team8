@@ -28,6 +28,13 @@ const ProviderDashboard: React.FC = () => {
     serviceType: '',
     active: true,
   });
+  const [statistics, setStatistics] = useState<any>(null);
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [replyingToReview, setReplyingToReview] = useState<number | null>(null);
+  const [replyText, setReplyText] = useState<string>('');
 
   useEffect(() => {
     const loadProviderData = () => {
@@ -164,8 +171,73 @@ const ProviderDashboard: React.FC = () => {
     }
   };
 
+  const loadStatistics = async () => {
+    if (!providerData?.id) return;
+    
+    try {
+      setStatsLoading(true);
+      
+      // Load statistics, subscriptions, and reviews in parallel
+      const [statsData, subsData, reviewsData] = await Promise.all([
+        api.getProviderStatistics(providerData.id),
+        api.getProviderSubscriptions(providerData.id),
+        api.getProviderReviews(providerData.id)
+      ]);
+      
+      setStatistics(statsData);
+      setSubscriptions(subsData);
+      setReviews(reviewsData);
+    } catch (error) {
+      console.error('Error loading statistics:', error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  const loadReviews = async () => {
+    if (!providerData?.id) return;
+    
+    try {
+      setReviewsLoading(true);
+      const reviewsData = await api.getProviderReviews(providerData.id);
+      setReviews(reviewsData);
+    } catch (error) {
+      console.error('Error loading reviews:', error);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  const handleAddReply = async (reviewId: number) => {
+    if (!replyText.trim()) {
+      alert('Please enter a response');
+      return;
+    }
+
+    try {
+      await api.addProviderResponse(reviewId, replyText);
+      alert('Response added successfully!');
+      setReplyingToReview(null);
+      setReplyText('');
+      await loadReviews();
+    } catch (error) {
+      console.error('Error adding response:', error);
+      alert('Failed to add response. Please try again.');
+    }
+  };
+
   const showSection = (section: string) => {
     setActiveSection(section);
+    
+    // Load statistics when navigating to statistics section
+    if (section === 'statistics' && !statistics) {
+      loadStatistics();
+    }
+    
+    // Load reviews when navigating to reviews section
+    if (section === 'reviews' && reviews.length === 0) {
+      loadReviews();
+    }
   };
 
   const removeProfile = async () => {
@@ -521,22 +593,421 @@ const ProviderDashboard: React.FC = () => {
       {/* Statistics Section */}
       {activeSection === 'statistics' && (
         <div className="container-fluid py-4">
-          <h2 className="mb-4">Customer Statistics</h2>
-          <div className="alert alert-info">
-            <h4>Statistics Dashboard</h4>
-            <p>Customer statistics and analytics features are coming soon. This will show your total customers, monthly growth, ratings, and reviews.</p>
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h2>Customer Statistics</h2>
+            <button 
+              className="btn btn-primary"
+              onClick={loadStatistics}
+              disabled={statsLoading}
+            >
+              <i className="bi bi-arrow-clockwise me-2"></i>
+              {statsLoading ? 'Loading...' : 'Refresh Stats'}
+            </button>
           </div>
+
+          {statsLoading ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading statistics...</span>
+              </div>
+            </div>
+          ) : statistics ? (
+            <>
+              {/* Overview Cards */}
+              <div className="row g-3 mb-4">
+                <div className="col-md-3">
+                  <div className="card bg-primary text-white h-100">
+                    <div className="card-body">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h6 className="card-subtitle mb-2 text-white-50">Total Subscriptions</h6>
+                          <h2 className="card-title mb-0">{subscriptions.length}</h2>
+                        </div>
+                        <i className="bi bi-people-fill fs-1 opacity-50"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="col-md-3">
+                  <div className="card bg-success text-white h-100">
+                    <div className="card-body">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h6 className="card-subtitle mb-2 text-white-50">Average Rating</h6>
+                          <h2 className="card-title mb-0">
+                            {statistics.averageRating ? statistics.averageRating.toFixed(1) : '0.0'}
+                            <i className="bi bi-star-fill ms-2 fs-5"></i>
+                          </h2>
+                        </div>
+                        <i className="bi bi-star-fill fs-1 opacity-50"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="col-md-3">
+                  <div className="card bg-info text-white h-100">
+                    <div className="card-body">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h6 className="card-subtitle mb-2 text-white-50">Total Reviews</h6>
+                          <h2 className="card-title mb-0">{statistics.totalReviews || 0}</h2>
+                        </div>
+                        <i className="bi bi-chat-dots-fill fs-1 opacity-50"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="col-md-3">
+                  <div className="card bg-warning text-dark h-100">
+                    <div className="card-body">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h6 className="card-subtitle mb-2">Active Services</h6>
+                          <h2 className="card-title mb-0">{services.filter(s => s.active).length}</h2>
+                        </div>
+                        <i className="bi bi-tools fs-1 opacity-50"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Rating Distribution */}
+              {statistics.ratingDistribution && (
+                <div className="card mb-4">
+                  <div className="card-header bg-light">
+                    <h5 className="mb-0">
+                      <i className="bi bi-bar-chart-fill me-2"></i>
+                      Rating Distribution
+                    </h5>
+                  </div>
+                  <div className="card-body">
+                    {[5, 4, 3, 2, 1].map((rating) => {
+                      const count = statistics.ratingDistribution[rating] || 0;
+                      const percentage = statistics.totalReviews > 0 
+                        ? (count / statistics.totalReviews) * 100 
+                        : 0;
+                      
+                      return (
+                        <div key={rating} className="mb-3">
+                          <div className="d-flex align-items-center mb-1">
+                            <span className="me-2" style={{ minWidth: '60px' }}>
+                              {rating} <i className="bi bi-star-fill text-warning"></i>
+                            </span>
+                            <div className="progress flex-grow-1 me-2" style={{ height: '20px' }}>
+                              <div 
+                                className={`progress-bar ${rating >= 4 ? 'bg-success' : rating >= 3 ? 'bg-warning' : 'bg-danger'}`}
+                                role="progressbar" 
+                                style={{ width: `${percentage}%` }}
+                                aria-valuenow={percentage} 
+                                aria-valuemin={0} 
+                                aria-valuemax={100}
+                              >
+                                {percentage > 10 && `${percentage.toFixed(0)}%`}
+                              </div>
+                            </div>
+                            <span className="text-muted" style={{ minWidth: '40px' }}>
+                              ({count})
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div className="row">
+                {/* Service Ratings */}
+                {statistics.serviceRatings && Object.keys(statistics.serviceRatings).length > 0 && (
+                  <div className="col-md-6 mb-4">
+                    <div className="card h-100">
+                      <div className="card-header bg-light">
+                        <h5 className="mb-0">
+                          <i className="bi bi-tools me-2"></i>
+                          Service Ratings
+                        </h5>
+                      </div>
+                      <div className="card-body">
+                        <div className="list-group list-group-flush">
+                          {Object.entries(statistics.serviceRatings).map(([serviceName, rating]: [string, any]) => (
+                            <div key={serviceName} className="list-group-item d-flex justify-content-between align-items-center px-0">
+                              <span>{serviceName}</span>
+                              <span className="badge bg-warning text-dark">
+                                {typeof rating === 'number' ? rating.toFixed(1) : rating} <i className="bi bi-star-fill"></i>
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Subscribed Customers */}
+                <div className="col-md-6 mb-4">
+                  <div className="card h-100">
+                    <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                      <h5 className="mb-0">
+                        <i className="bi bi-people me-2"></i>
+                        Subscribed Customers
+                      </h5>
+                      <span className="badge bg-primary">{subscriptions.length}</span>
+                    </div>
+                    <div className="card-body" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                      {subscriptions.length === 0 ? (
+                        <div className="text-center text-muted py-4">
+                          <i className="bi bi-inbox fs-1 d-block mb-2"></i>
+                          <p>No subscriptions yet</p>
+                        </div>
+                      ) : (
+                        <div className="list-group list-group-flush">
+                          {subscriptions.map((sub: any, index: number) => (
+                            <div key={sub.id || index} className="list-group-item px-0">
+                              <div className="d-flex justify-content-between align-items-start">
+                                <div>
+                                  <h6 className="mb-1">
+                                    {sub.customer?.firstName} {sub.customer?.lastName}
+                                  </h6>
+                                  <p className="mb-1 small text-muted">
+                                    <i className="bi bi-envelope me-1"></i>
+                                    {sub.customer?.email}
+                                  </p>
+                                  <p className="mb-0 small">
+                                    <strong>Service:</strong> {sub.service?.name}
+                                  </p>
+                                </div>
+                                <span className="badge bg-success">Active</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Reviews */}
+              {reviews.length > 0 && (
+                <div className="card">
+                  <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 className="mb-0">
+                      <i className="bi bi-chat-left-text me-2"></i>
+                      Recent Reviews
+                    </h5>
+                    <button 
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={() => showSection('reviews')}
+                    >
+                      View All Reviews
+                    </button>
+                  </div>
+                  <div className="card-body">
+                    <div className="row">
+                      {reviews.slice(0, 3).map((review: any) => (
+                        <div key={review.id} className="col-md-4 mb-3">
+                          <div className="card h-100 border">
+                            <div className="card-body">
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <h6 className="mb-0">
+                                  {review.customer?.firstName} {review.customer?.lastName}
+                                </h6>
+                                <span className="badge bg-warning text-dark">
+                                  {review.rating} <i className="bi bi-star-fill"></i>
+                                </span>
+                              </div>
+                              <p className="small text-muted mb-2">
+                                <i className="bi bi-tools me-1"></i>
+                                {review.service?.name}
+                              </p>
+                              <p className="card-text small">
+                                {review.comment?.length > 100 
+                                  ? `${review.comment.substring(0, 100)}...` 
+                                  : review.comment}
+                              </p>
+                              <p className="small text-muted mb-0">
+                                <i className="bi bi-calendar me-1"></i>
+                                {new Date(review.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="alert alert-info">
+              <h4>No Statistics Available</h4>
+              <p>Click "Refresh Stats" to load your customer statistics.</p>
+            </div>
+          )}
         </div>
       )}
 
       {/* Reviews Section */}
       {activeSection === 'reviews' && (
         <div className="container-fluid py-4">
-          <h2 className="mb-4">Customer Reviews</h2>
-          <div className="alert alert-info">
-            <h4>Reviews Management</h4>
-            <p>Customer reviews and rating features are coming soon. You will be able to view and respond to customer feedback here.</p>
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h2>Customer Reviews</h2>
+            <button 
+              className="btn btn-primary"
+              onClick={loadReviews}
+              disabled={reviewsLoading}
+            >
+              <i className="bi bi-arrow-clockwise me-2"></i>
+              {reviewsLoading ? 'Loading...' : 'Refresh Reviews'}
+            </button>
           </div>
+
+          {reviewsLoading ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading reviews...</span>
+              </div>
+            </div>
+          ) : reviews.length === 0 ? (
+            <div className="alert alert-info">
+              <h4><i className="bi bi-inbox me-2"></i>No Reviews Yet</h4>
+              <p>You haven't received any customer reviews yet. Reviews will appear here once customers subscribe to your services and leave feedback.</p>
+            </div>
+          ) : (
+            <div className="row">
+              {reviews.map((review: any) => (
+                <div key={review.id} className="col-12 mb-3">
+                  <div className="card">
+                    <div className="card-body">
+                      <div className="d-flex justify-content-between align-items-start mb-3">
+                        <div className="flex-grow-1">
+                          <div className="d-flex align-items-center mb-2">
+                            <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                 style={{ width: '50px', height: '50px', fontSize: '20px' }}>
+                              {review.customer?.firstName?.[0]}{review.customer?.lastName?.[0]}
+                            </div>
+                            <div>
+                              <h5 className="mb-0">
+                                {review.customer?.firstName} {review.customer?.lastName}
+                              </h5>
+                              <p className="text-muted small mb-0">
+                                <i className="bi bi-envelope me-1"></i>
+                                {review.customer?.email}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-end">
+                          <div className="mb-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <i 
+                                key={star}
+                                className={`bi bi-star${star <= review.rating ? '-fill' : ''} ${
+                                  star <= review.rating ? 'text-warning' : 'text-muted'
+                                }`}
+                              ></i>
+                            ))}
+                            <span className="ms-2 badge bg-warning text-dark">
+                              {review.rating}/5
+                            </span>
+                          </div>
+                          <small className="text-muted">
+                            <i className="bi bi-calendar me-1"></i>
+                            {new Date(review.createdAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </small>
+                        </div>
+                      </div>
+
+                      <div className="mb-3">
+                        <p className="text-muted small mb-1">
+                          <i className="bi bi-tools me-1"></i>
+                          <strong>Service:</strong> {review.service?.name}
+                        </p>
+                        <div className="bg-light p-3 rounded">
+                          <p className="mb-0">{review.comment}</p>
+                        </div>
+                      </div>
+
+                      {/* Provider Response Section */}
+                      {review.providerResponse ? (
+                        <div className="bg-success bg-opacity-10 p-3 rounded border-start border-success border-4">
+                          <div className="d-flex justify-content-between align-items-start mb-2">
+                            <h6 className="text-success mb-0">
+                              <i className="bi bi-reply-fill me-2"></i>
+                              Your Response
+                            </h6>
+                            <small className="text-muted">
+                              <i className="bi bi-calendar me-1"></i>
+                              {new Date(review.responseDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })}
+                            </small>
+                          </div>
+                          <p className="mb-0">{review.providerResponse}</p>
+                        </div>
+                      ) : replyingToReview === review.id ? (
+                        <div className="border-top pt-3">
+                          <h6 className="mb-3">
+                            <i className="bi bi-reply me-2"></i>
+                            Add Your Response
+                          </h6>
+                          <textarea
+                            className="form-control mb-3"
+                            rows={3}
+                            placeholder="Write your response to this review..."
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                          />
+                          <div className="d-flex gap-2">
+                            <button
+                              className="btn btn-success"
+                              onClick={() => handleAddReply(review.id)}
+                              disabled={!replyText.trim()}
+                            >
+                              <i className="bi bi-send me-2"></i>
+                              Submit Response
+                            </button>
+                            <button
+                              className="btn btn-secondary"
+                              onClick={() => {
+                                setReplyingToReview(null);
+                                setReplyText('');
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="border-top pt-3">
+                          <button
+                            className="btn btn-outline-primary"
+                            onClick={() => {
+                              setReplyingToReview(review.id);
+                              setReplyText('');
+                            }}
+                          >
+                            <i className="bi bi-reply me-2"></i>
+                            Reply to Review
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

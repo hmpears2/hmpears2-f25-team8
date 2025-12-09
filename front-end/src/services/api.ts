@@ -1,10 +1,7 @@
 const API_BASE_URL = 'http://localhost:8080';
 
 export const api = {
-  // ============================================
-  // PROVIDER APIs
-  // ============================================
-  
+
   async registerProvider(providerData: any) {
     const response = await fetch(`${API_BASE_URL}/providers/register`, {
       method: 'POST',
@@ -36,6 +33,46 @@ export const api = {
     });
     if (!response.ok) {
       throw new Error('Failed to create service');
+    }
+    return response.json();
+  },
+
+  // ============================================
+  // PROVIDER STATISTICS APIs
+  // ============================================
+
+  async getProviderStatistics(providerId: number) {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/provider/${providerId}/statistics`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch provider statistics');
+    }
+    return response.json();
+  },
+
+  async getProviderSubscriptions(providerId: number) {
+    const response = await fetch(`${API_BASE_URL}/api/subscriptions/provider/${providerId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch provider subscriptions');
+    }
+    return response.json();
+  },
+
+  async getProviderReviews(providerId: number) {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/provider/${providerId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch provider reviews');
+    }
+    return response.json();
+  },
+
+  async addProviderResponse(reviewId: number, providerResponse: string) {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}/response`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ providerResponse }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add provider response');
     }
     return response.json();
   },

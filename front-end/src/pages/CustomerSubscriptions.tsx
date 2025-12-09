@@ -193,7 +193,7 @@ const CustomerSubscriptions: React.FC<CustomerSubscriptionsProps> = ({ customerI
                     <div>
                       <h5 className="card-title mb-1">{subscription.service.name}</h5>
                       <p className="text-muted small mb-0">
-                        by {subscription.service.provider.companyName}
+                        by {subscription.service.provider?.businessName || 'Unknown Provider'}
                       </p>
                     </div>
                     <span className="badge bg-success">Active</span>
@@ -242,11 +242,11 @@ const CustomerSubscriptions: React.FC<CustomerSubscriptionsProps> = ({ customerI
                     <small className="text-muted d-block mb-1">Provider Contact:</small>
                     <div className="small">
                       <i className="bi bi-person me-1"></i>
-                      {subscription.service.provider.firstName} {subscription.service.provider.lastName}<br />
+                      {subscription.service.provider?.firstName} {subscription.service.provider?.lastName}<br />
                       <i className="bi bi-envelope me-1"></i>
-                      {subscription.service.provider.email}<br />
+                      {subscription.service.provider?.email}<br />
                       <i className="bi bi-telephone me-1"></i>
-                      {subscription.service.provider.phoneNumber}
+                      {subscription.service.provider?.phone || subscription.service.provider?.phoneNumber || 'N/A'}
                     </div>
                   </div>
 
