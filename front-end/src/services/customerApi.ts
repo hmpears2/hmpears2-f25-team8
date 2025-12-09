@@ -23,8 +23,18 @@ async function handleResponse<T>(response: Response): Promise<T> {
     throw new Error(error || `HTTP error! status: ${response.status}`);
   }
   
-  const data = await response.json();
-  return data;
+  // Handle 204 No Content or empty responses
+  if (response.status === 204 || response.headers.get('content-length') === '0') {
+    return undefined as T;
+  }
+  
+  // Check if there's actually content to parse
+  const text = await response.text();
+  if (!text) {
+    return undefined as T;
+  }
+  
+  return JSON.parse(text);
 }
 
 // Helper function to build headers
