@@ -65,6 +65,8 @@ const ProviderSignup: React.FC = () => {
 
     try {
       const providerData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         businessName: formData.businessName,
         email: formData.email,
         password: formData.password,
