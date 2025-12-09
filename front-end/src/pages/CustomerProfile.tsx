@@ -65,6 +65,11 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ customer, onUpdate })
       if (!updateData.password) {
         delete updateData.password;
       }
+      
+      // Strip non-digits from phone number to match backend validation (10 digits only)
+      if (updateData.phoneNumber) {
+        updateData.phoneNumber = updateData.phoneNumber.replace(/\D/g, '');
+      }
 
       const updatedCustomer = await customerApi.updateProfile(customer.id, updateData);
       

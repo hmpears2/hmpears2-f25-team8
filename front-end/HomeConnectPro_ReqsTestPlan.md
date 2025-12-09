@@ -1,8 +1,8 @@
 # HomeConnect Pro Requirements Testing
 
 ## Actors
-- Service Provider
-- Customer
+- Provider - Home Service Providers
+- Customer - New/Existing Homeowners
 
 ## 3rd Party API Integration
 - **API Used**: Google Maps Geocoding API
@@ -170,7 +170,7 @@
 
 ## Data Persistence Verification
 
-After all use cases are completed, verify the following data is stored in the database:
+After all use cases are completed, verify the following data is stored in the database: (Examples)
 
 ### PROVIDER Table
 | id | first_name | last_name | email | phone | business_name | address | primary_service |

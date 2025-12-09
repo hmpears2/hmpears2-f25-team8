@@ -1,7 +1,6 @@
 package com.HomeConnectPro_hub.customer;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,7 @@ public class UpdateCustomerDTO {
     @Email(message = "Email must be valid")
     private String email;
     
-    @Pattern(regexp = "^\\d{10}$", message = "Phone number must be 10 digits")
+    // Phone number validation handled in service layer to allow flexible input formats
     private String phoneNumber;
     
     private String address;
